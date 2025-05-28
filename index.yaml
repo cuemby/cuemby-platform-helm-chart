@@ -1,0 +1,60 @@
+apiVersion: v1
+entries:
+  configurator:
+  - apiVersion: v2
+    created: "2025-05-27T12:18:06.487377-05:00"
+    description: The cuemby platform configurator
+    digest: 7e08a500a792972fd57cbe667205cf2ff03ab3ba33a1429dfe4d8695cbc44f93
+    name: configurator
+    icon: https://avatars.githubusercontent.com/u/820851?s=400&u=a3fe9f508129d36d50df1da7c9820beec0041233&v=4
+    type: application
+    urls:
+    - charts/configurator-1.0.0.tgz
+    version: 1.0.0
+  cuemby-platform:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-05-27T12:18:06.487255-05:00"
+    dependencies:
+    - condition: configurator.enable
+      name: configurator
+      repository: file://charts/configurator
+      version: 1.0.0
+    - condition: supabase.enable
+      name: supabase
+      repository: file://charts/supabase
+      version: '>=0.1.0'
+    - condition: walrus.enable
+      name: walrus
+      repository: file://charts/walrus
+      version: 1.0.0
+    description: A Helm chart that installs cuemby-platform and its dependencies.
+    digest: ded167f7c333107847dad949e51a741a8354172cbe102c377c74322f90f62bc2
+    name: cuemby-platform
+    type: application
+    urls:
+    - build/cuemby-platform-0.1.0.tgz
+    version: 0.1.0
+  supabase:
+  - apiVersion: v2
+    created: "2025-05-27T12:18:06.49059-05:00"
+    description: The open source Firebase alternative.
+    digest: 861b8403d9665a92df99adcca37ab7b6efcbc2c34705ea179ea25c8e2dd1fc5c
+    icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
+    name: supabase
+    type: application
+    urls:
+    - charts/supabase-0.1.3.tgz
+    version: 0.1.3
+  walrus:
+  - apiVersion: v2
+    created: "2025-05-27T12:18:06.490857-05:00"
+    description: The walrus
+    digest: 642830e985a6b2dc8b8a21b4f3256d4dc1ce982317a506f6eb016768b3d43a7b
+    icon: https://seal-io.github.io/docs/img/walrus_logo.png
+    name: walrus
+    type: application
+    urls:
+    - charts/walrus-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-05-27T12:18:06.481419-05:00"

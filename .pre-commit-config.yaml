@@ -1,0 +1,52 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+      - id: lowercase-subject
+        name: lowercase-subject
+        entry: bash -c 'grep -q "^[a-z]" "$1" || { echo "Subject must be lowercase"; exit 1; }' --
+        language: system
+        stages: [commit-msg]
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.6.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [--verbose, --strict, build, ci, docs, feat, fix, chore, test, custom, perf, refactor, revert, test]
+
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.34.0
+    hooks:
+      - id: ggshield
+        name: GitGuardian Shield
+        language_version: python3
+        stages: [pre-commit]
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.1.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # - repo: https://github.com/gruntwork-io/pre-commit
+  #   rev: v0.1.15
+  #   hooks:
+  #     - id: helmlint
+
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.10.0
+    hooks:
+      - id: helm-docs
+        files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$

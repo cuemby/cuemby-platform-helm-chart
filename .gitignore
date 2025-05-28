@@ -1,0 +1,6 @@
+### Helm ###
+# Chart dependencies
+**/charts/*.tgz
+out/
+build/
+.cache*

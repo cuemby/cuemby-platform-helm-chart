@@ -1,0 +1,9 @@
+*.tgz
+*.tar.gz
+.DS_Store
+.git
+.gitignore
+build/
+charts/supabase/docker/
+charts/supabase/ci/
+charts/supabase/output.yaml

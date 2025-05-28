@@ -1,0 +1,17 @@
+# harbor:
+#   enabled: true
+
+# prometheus:
+#   enabled: false
+
+# vm:
+#   enabled: false
+
+configurator:
+  enabled: true
+
+walrus:
+  enabled: true
+
+supabase:
+  enabled: true
