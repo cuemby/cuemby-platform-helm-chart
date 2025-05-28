@@ -1,0 +1,115 @@
+{{- if .Values.iam.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: walrus-system
+  name: identity-access-manager
+  labels:
+    "app.kubernetes.io/part-of": "walrus"
+    "app.kubernetes.io/component": "identity-access-manager"
+    "app.kubernetes.io/name": "casdoor"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      "app.kubernetes.io/part-of": "walrus"
+      "app.kubernetes.io/component": "identity-access-manager"
+      "app.kubernetes.io/name": "casdoor"
+  template:
+    metadata:
+      labels:
+        "app.kubernetes.io/part-of": "walrus"
+        "app.kubernetes.io/component": "identity-access-manager"
+        "app.kubernetes.io/name": "casdoor"
+    spec:
+      automountServiceAccountToken: false
+      restartPolicy: Always
+      initContainers:
+        - name: init
+          image: sealio/casdoor:v1.515.0-seal.1
+          imagePullPolicy: IfNotPresent
+          workingDir: /tmp/conf
+          command:
+            - /script/init.sh
+          env:
+            - name: DB_DRIVER
+              valueFrom:
+                secretKeyRef:
+                  name: walrus-secrets
+                  key: db_driver
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: walrus-secrets
+                  key: db_user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: walrus-secrets
+                  key: db_password
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: walrus-secrets
+                  key: db_name
+            - name: DB_SOURCE
+              value: $(DB_DRIVER)://$(DB_USER):$(DB_PASSWORD)@database:5432/$(DB_NAME)?sslmode=disable
+          volumeMounts:
+            - name: script
+              mountPath: /script
+            - name: config
+              mountPath: /tmp/conf
+      containers:
+        - name: casdoor
+          image: sealio/casdoor:v1.515.0-seal.1
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: '2'
+              memory: '4Gi'
+            requests:
+              cpu: '500m'
+              memory: '512Mi'
+          workingDir: /
+          command:
+            - /casdoor
+            - --createDatabase=true
+          ports:
+            - name: http
+              containerPort: 8000
+          startupProbe:
+            failureThreshold: 10
+            periodSeconds: 5
+
+            tcpSocket:
+              port: 8000
+          readinessProbe:
+            failureThreshold: 3
+            timeoutSeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: 8000
+          livenessProbe:
+            failureThreshold: 3
+            timeoutSeconds: 5
+            periodSeconds: 10
+            tcpSocket:
+              port: 8000
+          volumeMounts:
+            - name: config
+              mountPath: /conf
+            - name: data
+              mountPath: /var/run/casdoor
+      volumes:
+        - name: script
+          configMap:
+            name: identity-access-manager-script
+            defaultMode: 0500
+        - name: config
+          emptyDir: { }
+        - name: data
+          emptyDir: { }
+{{- end }}
+
+# App Manager
+#

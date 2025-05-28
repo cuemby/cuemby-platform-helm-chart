@@ -1,0 +1,70 @@
+{{- if .Values.minio.enabled -}}
+apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
+kind: Deployment
+metadata:
+  # This name uniquely identifies the Deployment
+  name: minio
+  namespace: walrus-system
+  labels:
+    "app.kubernetes.io/part-of": "walrus"
+    "app.kubernetes.io/component": "minio"
+    "app.kubernetes.io/name": "minio"
+spec:
+  selector:
+    matchLabels:
+      "app.kubernetes.io/part-of": "walrus"
+      "app.kubernetes.io/component": "minio"
+      "app.kubernetes.io/name": "minio"
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        "app.kubernetes.io/part-of": "walrus"
+        "app.kubernetes.io/component": "minio"
+        "app.kubernetes.io/name": "minio"
+    spec:
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: minio
+      containers:
+      - name: minio
+        image: minio/minio:RELEASE.2024-02-26T09-33-48Z
+        args:
+        - server
+        - /storage
+        - '--console-address'
+        - ':9001'
+        resources:
+          limits:
+            cpu: '1'
+            memory: '1Gi'
+          requests:
+            cpu: '500m'
+            memory: '512Mi'
+        ports:
+        - name: minio-api
+          containerPort: 9000
+          protocol: TCP
+        - name: minio-dashboard
+          containerPort: 9001
+          protocol: TCP
+        env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: walrus-secrets
+              key: minio_root_user
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: walrus-secrets
+              key: minio_root_password
+        volumeMounts:
+        - name: storage
+          mountPath: "/storage"
+{{- end }}
+# Identity Access Manager
+#
