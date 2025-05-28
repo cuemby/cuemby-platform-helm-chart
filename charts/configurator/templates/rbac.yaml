@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: cp-system
+  name: cp-configurator-sa
+  labels:
+    "app.kubernetes.io/part-of": "cp-configurator-sa"
+    "app.kubernetes.io/component": "cp-configurator-sa"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: cp-system
+  name: cp-configurator-role
+  labels:
+    "app.kubernetes.io/part-of": "cp-configurator-role"
+    "app.kubernetes.io/component": "cp-configurator-role"
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets", "deployments", "services", "pods", "pods/log"]
+  verbs: ["get", "watch", "list", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cp-configurator-role-binding
+  labels:
+    "app.kubernetes.io/part-of": "cp-configurator-role-binding"
+    "app.kubernetes.io/component": "cp-configurator-role-binding"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "cp-configurator-role"
+subjects:
+  - kind: ServiceAccount
+    name: "cp-configurator-sa"
+    namespace: cp-system

@@ -1,0 +1,9 @@
+{{- if .Values.configurator.enabled -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cp-system
+  labels:
+    name: development
+    app.kubernetes.io/part-of: "cp-system"
+{{- end }}
