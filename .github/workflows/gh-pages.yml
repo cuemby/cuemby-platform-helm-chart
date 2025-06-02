@@ -22,7 +22,7 @@ jobs:
 
       - name: 📦 Run build.sh with public URL
         env:
-          REPO_URL: https://cuemby.github.io/cuemby-platform-helm-chart/charts
+          REPO_URL: https://cuemby.github.io/cuemby-platform-helm-chart
         run: |
           chmod +x ./build.sh
           ./build.sh
@@ -31,6 +31,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GH_TOKEN }}
-          publish_dir: ./
+          publish_dir: ./charts
           publish_branch: gh-pages
           force_orphan: true
