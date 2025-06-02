@@ -1,0 +1,15 @@
+{{- if .Values.iam.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: walrus-system
+  name: identity-access-manager
+spec:
+  selector:
+    "app.kubernetes.io/part-of": "walrus"
+    "app.kubernetes.io/component": "identity-access-manager"
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+{{- end }}

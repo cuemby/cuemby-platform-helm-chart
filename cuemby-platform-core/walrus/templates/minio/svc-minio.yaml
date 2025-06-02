@@ -1,0 +1,20 @@
+{{- if .Values.minio.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: walrus-system
+  name: minio
+spec:
+  selector:
+    "app.kubernetes.io/part-of": "walrus"
+    "app.kubernetes.io/component": "minio"
+  ports:
+    - name: minio-api
+      protocol: TCP
+      port: 9000
+      targetPort: minio-api
+    - name: minio-dashboard
+      protocol: TCP
+      port: 9001
+      targetPort: minio-dashboard
+{{- end }}

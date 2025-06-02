@@ -1,0 +1,37 @@
+{{- if .Values.iam.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: walrus-system
+  name: identity-access-manager-script
+data:
+  "init.sh": |
+    #!/usr/bin/env bash
+
+    set -o errexit
+    set -o nounset
+    set -o pipefail
+
+    # validate database
+    set +o errexit
+    while true; do
+      if psql --command="SELECT 1" "${DB_SOURCE}" >/dev/null 2>&1; then
+        break
+      fi
+      echo "waiting db to be ready ..."
+      sleep 2s
+    done
+    set -o errexit
+
+    # mutate app configuration
+    cp -f /conf/app.conf app.conf
+    sed -i '/^tableNamePrefix =.*/d' app.conf
+    echo "tableNamePrefix = casdoor_" >>app.conf
+    sed -i '/^driverName =.*/d' app.conf
+    echo "driverName = \"${DB_DRIVER}\"" >>app.conf
+    sed -i '/^dataSourceName =.*/d' app.conf
+    echo "dataSourceName = \"${DB_SOURCE}\"" >>app.conf
+    sed -i '/^sessionConfig =.*/d' app.conf
+    echo 'sessionConfig = {"enableSetCookie":true,"cookieName":"casdoor_session_id","cookieLifeTime":3600,"providerConfig":"/var/run/casdoor","gclifetime":3600,"domain":"","secure":false,"disableHTTPOnly":false}' >>app.conf
+    sed "s#${DB_PASSWORD}#***#g" app.conf
+{{- end }}
