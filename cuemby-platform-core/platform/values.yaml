@@ -1,0 +1,49 @@
+secret:
+  db:
+    username: ""
+    password: ""
+    database: ""
+  github:
+    clientId: ""
+    clientSecret: ""
+
+rabbitmq:
+  auth:
+    username: ""
+    password: ""
+    erlangCookie: ""
+  service:
+    type: ClusterIP
+  livenessProbe:
+    enabled: true
+  readinessProbe:
+    enabled: true
+
+platform:
+  name: "platform"
+  enabled: true
+  dockerconfig:
+    registry: ""
+    username: ""
+    password: ""
+  service:
+    type: NodePort
+    port: 9080
+  imagePullSecrets:
+    - name: credentials-registry
+  image:
+    repository: ""
+    pullPolicy: Always
+    tag: ""
+  environment:
+    POSTGRES_URI: ""
+    # RABBIT_URI: "amqp://guest:password@localhost:5672"
+    API_KEY: ""
+    MINIO_ENDPOINT: ""
+    MINIO_ACCESS_KEY_ID: ""
+    MINIO_SECRET_ACCESS_KEY: ""
+    QUEUE_NAME_DELETION_WORKER: "deletion_worker_stg"
+    REDIS_ADDR: ""
+    REDIS_USERNAME: "default"
+    REDIS_PASSWORD: ""
+    REDIS_WEBHOOK_DB: "15"
