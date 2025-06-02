@@ -1,0 +1,36 @@
+name: Publish Helm Charts to GitHub Pages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to push to gh-pages branch
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.13.0
+
+      - name: 📦 Run build.sh with public URL
+        env:
+          REPO_URL: https://cuemby.github.io/cuemby-platform-helm-chart/charts
+        run: |
+          chmod +x ./build.sh
+          ./build.sh
+
+      - name: 🚀 Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./charts
+          publish_branch: gh-pages
+          force_orphan: true
