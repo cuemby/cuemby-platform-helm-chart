@@ -2,6 +2,7 @@
 
 set -euo pipefail
 CHARTS_DIR="charts"
+REPO_URL="${REPO_URL:-}"
 
 echo "🚀 Preparing Helm..."
 
@@ -10,7 +11,7 @@ echo "🧹 Deleting old .tgz files..."
 mkdir -p "$CHARTS_DIR"
 rm -f "$CHARTS_DIR"/*.tgz
 
-# Funtion to package charts that contain Chart.yaml
+# Function to package charts that contain Chart.yaml
 package_chart() {
   local chart_dir="$1"
   if [ -f "$chart_dir/Chart.yaml" ]; then
@@ -31,7 +32,12 @@ if [ -f cuemby-platform/Chart.yaml ]; then
 fi
 
 # Generate or update the index.yaml file
-echo "🧭 Updating index.yaml..."
-helm repo index "$CHARTS_DIR"
+if [ -n "$REPO_URL" ]; then
+  echo "🧭 Generate index.yaml with URL: $REPO_URL"
+  helm repo index "$CHARTS_DIR" --url "$REPO_URL"
+else
+  echo "🧭 Generate index.yaml locally (sin URL remota)"
+  helm repo index "$CHARTS_DIR"
+fi
 
 echo "✅ All charts were packaged and ready for publication."
