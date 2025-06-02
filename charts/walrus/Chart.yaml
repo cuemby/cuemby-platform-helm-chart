@@ -1,5 +1,0 @@
-apiVersion: v2
-name: walrus
-description: The walrus
-type: application
-version: 1.0.0

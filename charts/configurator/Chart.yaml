@@ -1,5 +1,0 @@
-apiVersion: v2
-name: configurator
-description: The cuemby platform configurator
-type: application
-version: 1.0.0
