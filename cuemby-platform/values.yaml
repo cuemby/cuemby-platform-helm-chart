@@ -1,0 +1,8 @@
+supabase:
+  enabled: true
+
+walrus:
+  enabled: true
+
+configurator:
+  enabled: true
