@@ -8,4 +8,5 @@ metadata:
 data:
   WALRUS_API_KEY: ""
   WALRUS_PASSWORD: ""
+  KUBE_CONFIG: ""
 {{- end }}

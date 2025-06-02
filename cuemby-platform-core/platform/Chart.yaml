@@ -1,0 +1,9 @@
+apiVersion: v2
+name: platform
+description: The platform is a service that provides the core functionalities of the Cuemby Platform.
+type: application
+version: 1.0.0
+dependencies:
+  - name: rabbitmq
+    version: 12.0.0
+    repository: https://charts.bitnami.com/bitnami

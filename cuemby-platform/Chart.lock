@@ -1,0 +1,15 @@
+dependencies:
+- name: supabase
+  repository: file://../cuemby-platform-core/supabase
+  version: 0.1.3
+- name: walrus
+  repository: file://../cuemby-platform-core/walrus
+  version: 1.0.0
+- name: configurator
+  repository: file://../cuemby-platform-core/configurator
+  version: 1.0.0
+- name: platform
+  repository: file://../cuemby-platform-core/platform
+  version: 1.0.0
+digest: sha256:f92e2b5366a3d051dc304e52895bc4df77a47794467cbdb7180c8887efff6b22
+generated: "2025-06-02T09:49:09.645213-05:00"

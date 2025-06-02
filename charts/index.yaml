@@ -1,0 +1,100 @@
+apiVersion: v1
+entries:
+  configurator:
+  - apiVersion: v2
+    created: "2025-06-02T15:51:24.764811-05:00"
+    description: The cuemby platform configurator
+    digest: b3fce713a0e5b2b418574ab0754efc485170286ad966430ee765cdcee2c32c4b
+    name: configurator
+    type: application
+    urls:
+    - configurator-1.0.0.tgz
+    version: 1.0.0
+  cuemby-platform:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-06-02T15:51:24.770632-05:00"
+    dependencies:
+    - name: supabase
+      repository: file://../cuemby-platform-core/supabase
+      version: 0.1.3
+    - name: walrus
+      repository: file://../cuemby-platform-core/walrus
+      version: 1.0.0
+    - name: configurator
+      repository: file://../cuemby-platform-core/configurator
+      version: 1.0.0
+    - name: platform
+      repository: file://../cuemby-platform-core/platform
+      version: 1.0.0
+    description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
+    digest: 5d197b7ef1f38365f748d9990369b4a0a099bcbc11a9ea24a1f95b2a0fb66fc1
+    name: cuemby-platform
+    type: application
+    urls:
+    - cuemby-platform-1.0.0.tgz
+    version: 1.0.0
+  harbor:
+  - apiVersion: v1
+    appVersion: 2.9.0
+    created: "2025-06-02T15:51:24.772626-05:00"
+    description: An open source trusted cloud native registry that stores, signs,
+      and scans content
+    digest: 2aaac336e8defa316937355c3012d7321ddff9397d375a664255a67fb02d29a4
+    home: https://goharbor.io
+    icon: https://raw.githubusercontent.com/goharbor/website/main/static/img/logos/harbor-icon-color.png
+    keywords:
+    - docker
+    - registry
+    - harbor
+    maintainers:
+    - email: yinw@vmware.com
+      name: Wenkai Yin
+    - email: hweiwei@vmware.com
+      name: Weiwei He
+    - email: yshengwen@vmware.com
+      name: Shengwen Yu
+    name: harbor
+    sources:
+    - https://github.com/goharbor/harbor
+    - https://github.com/goharbor/harbor-helm
+    urls:
+    - harbor-1.13.0.tgz
+    version: 1.13.0
+  platform:
+  - apiVersion: v2
+    created: "2025-06-02T15:51:24.775379-05:00"
+    dependencies:
+    - name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.0.0
+    description: The platform is a service that provides the core functionalities
+      of the Cuemby Platform.
+    digest: e86bc953f3eba40b0963b161f2ca8ce452c5679c72f32733158f286265d5ccad
+    name: platform
+    type: application
+    urls:
+    - platform-1.0.0.tgz
+    version: 1.0.0
+  supabase:
+  - apiVersion: v2
+    created: "2025-06-02T15:51:24.77857-05:00"
+    description: The open source Firebase alternative.
+    digest: 9b056dd6ef4097a9e050c5818cf47c2edef0feecf58ced91d8ae9afbbd74f2e6
+    icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
+    name: supabase
+    type: application
+    urls:
+    - supabase-0.1.3.tgz
+    version: 0.1.3
+  walrus:
+  - apiVersion: v2
+    created: "2025-06-02T15:51:24.778944-05:00"
+    description: The walrus
+    digest: 2861ec189741b762f59437bfb38040cde5678b6e7c172121f519268589226782
+    name: walrus
+    type: application
+    urls:
+    - walrus-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-06-02T15:51:24.76439-05:00"

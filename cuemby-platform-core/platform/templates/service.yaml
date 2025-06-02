@@ -1,0 +1,24 @@
+{{- if .Values.platform.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: cp-system
+  name: platform-service
+  labels:
+    app.kubernetes.io/name: platform-service
+    app.kubernetes.io/part-of: "platform-service"
+    app.kubernetes.io/component: "platform-service"
+spec:
+  selector:
+    app.kubernetes.io/name: platform-service
+    app.kubernetes.io/part-of: "platform-service"
+    app.kubernetes.io/component: "platform-service"
+  sessionAffinity: ClientIP
+  type: {{ .Values.platform.service.type }}
+  ports:
+    - name: port-9080
+      protocol: TCP
+      port: {{ .Values.platform.service.port }}
+      targetPort: 9080
+      nodePort: 32609
+{{- end }}

@@ -1,16 +1,43 @@
 #!/bin/bash
 
 set -euo pipefail
+CHARTS_DIR="charts"
+REPO_URL="${REPO_URL:-}"
 
-CHART_NAME="cuemby-platform"
-CHART_VERSION="1.0.0"
+echo "🚀 Preparing Helm..."
 
-echo "==> Updating dependencies..."
-helm dependency update .
+# Delete previous packages
+echo "🧹 Deleting old .tgz files..."
+mkdir -p "$CHARTS_DIR"
+rm -f "$CHARTS_DIR"/*.tgz
 
-echo "==> Packaging chart..."
-mkdir -p build
-helm package . -d build
-helm repo index ./
+# Function to package charts that contain Chart.yaml
+package_chart() {
+  local chart_dir="$1"
+  if [ -f "$chart_dir/Chart.yaml" ]; then
+    echo "📦 Packaging: $chart_dir"
+    helm dependency update "$chart_dir" || echo "ℹ️ There are no dependencies to update in $chart_dir"
+    helm package "$chart_dir" -d "$CHARTS_DIR"
+  fi
+}
 
-echo "✅ Chart packaged: build/${CHART_NAME}-${CHART_VERSION}.tgz"
+# Packaging individual charts (core and registry)
+for dir in cuemby-platform-core/* cuemby-platform-registry/*; do
+  package_chart "$dir"
+done
+
+# Packaging the main metachart
+if [ -f cuemby-platform/Chart.yaml ]; then
+  package_chart cuemby-platform
+fi
+
+# Generate or update the index.yaml file
+if [ -n "$REPO_URL" ]; then
+  echo "🧭 Generate index.yaml with URL: $REPO_URL"
+  helm repo index "$CHARTS_DIR" --url "$REPO_URL"
+else
+  echo "🧭 Generate index.yaml locally (sin URL remota)"
+  helm repo index "$CHARTS_DIR"
+fi
+
+echo "✅ All charts were packaged and ready for publication."
