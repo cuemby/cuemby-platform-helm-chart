@@ -22,7 +22,7 @@ jobs:
 
       - name: 📦 Run build.sh with public URL
         env:
-          REPO_URL: https://cuemby.github.io/cuemby-platform-helm-chart/charts
+          REPO_URL: https://cuemby.github.io/cuemby-platform-helm-chart
         run: |
           chmod +x ./build.sh
           ./build.sh
