@@ -5,6 +5,8 @@ metadata:
   name: {{ include "supabase.functions.fullname" . }}
   labels:
     {{- include "supabase.labels" . | nindent 4 }}
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   {{- if not .Values.functions.autoscaling.enabled }}
   replicas: {{ .Values.functions.replicaCount }}
@@ -46,6 +48,9 @@ spec:
             {{- toYaml .Values.functions.securityContext | nindent 12 }}
           image: "{{ .Values.functions.image.repository }}:{{ .Values.functions.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.functions.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "supabase.functions.fullname" . }}-cp-config
           env:
             {{- range $key, $value := .Values.functions.environment }}
             - name: {{ $key }}
