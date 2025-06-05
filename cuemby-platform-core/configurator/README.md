@@ -4,6 +4,12 @@
 
 The cuemby platform configurator
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://stakater.github.io/stakater-charts | reloader | 1.0.104 |
+
 ## Values
 
 | Key | Type | Default | Description |

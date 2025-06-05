@@ -3,3 +3,7 @@ name: configurator
 description: The cuemby platform configurator
 type: application
 version: 1.0.0
+dependencies:
+  - name: reloader
+    version: "1.0.104"
+    repository: "https://stakater.github.io/stakater-charts"
