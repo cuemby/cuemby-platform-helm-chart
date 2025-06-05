@@ -7,7 +7,7 @@ metadata:
   namespace: cp-system
 spec:
   backoffLimit: 4 # Number of retries before the job is considered failed
-  activeDeadlineSeconds: 600 # Maximum time the job can run (10 minutes)
+  activeDeadlineSeconds: 900 # Maximum time the job can run (15 minutes)
   template:
     spec:
       restartPolicy: Never
@@ -25,6 +25,8 @@ spec:
             - name: {{ $key }}
               value: {{ $value | quote }}
             {{- end }}
+            - name: TARGET # This variable is mandatory with the core value (due to the core configuration of cp).
+              value: core
             # - name: PGPASSWORD
             #   value: ""
             # - name: PGUSERNAME
