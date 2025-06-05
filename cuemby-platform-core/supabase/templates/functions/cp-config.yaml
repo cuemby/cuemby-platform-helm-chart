@@ -9,4 +9,6 @@ data:
   WALRUS_API_KEY: ""
   WALRUS_PASSWORD: ""
   KUBE_CONFIG: ""
+  SWAGGER_API_KEY: ""
+  SECURE_REPOS_INTERNAL_KEY: ""
 {{- end }}
