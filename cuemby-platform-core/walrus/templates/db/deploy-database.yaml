@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: walrus-system
+  namespace: cuemby-platform
   name: database
   labels:
     "app.kubernetes.io/part-of": "walrus"

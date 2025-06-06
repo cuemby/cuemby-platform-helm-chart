@@ -41,18 +41,3 @@ Create the name of the service account to use
 {{- default "default" .Values.functions.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{/*
-Create the registry credentials for supabase functions
-*/}}
-{{- define "supabase.dockerconfigjson" -}}
-{
-  "auths": {
-    "{{ .Values.functions.dockerconfig.registry }}": {
-      "username": "{{ .Values.functions.dockerconfig.username }}",
-      "password": "{{ .Values.functions.dockerconfig.password }}",
-      "auth": "{{ printf "%s:%s" .Values.functions.dockerconfig.username .Values.functions.dockerconfig.password | b64enc }}"
-    }
-  }
-}
-{{- end -}}

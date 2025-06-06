@@ -6,6 +6,8 @@ metadata:
   labels:
     {{- include "supabase.labels" . | nindent 4 }}
 data:
+  WALRUS_BASE_URL: "http://walrus:80"
+  WALRUS_USERNAME: "admin"
   WALRUS_API_KEY: ""
   WALRUS_PASSWORD: ""
   KUBE_CONFIG: ""

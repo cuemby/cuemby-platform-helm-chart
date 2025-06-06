@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: cp-system
+  namespace: cuemby-platform
   name: platform-service
   labels:
     app.kubernetes.io/name: platform-service
