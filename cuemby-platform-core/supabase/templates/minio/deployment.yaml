@@ -60,9 +60,12 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: http
-              containerPort: 9000
-              protocol: TCP
+          - name: minio-api
+            containerPort: 9000
+            protocol: TCP
+          - name: minio-dashboard
+            containerPort: 9001
+            protocol: TCP
           {{- with .Values.minio.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
