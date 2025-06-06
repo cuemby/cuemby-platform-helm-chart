@@ -8,10 +8,14 @@ metadata:
 spec:
   type: {{ .Values.minio.service.type }}
   ports:
-    - port: {{ .Values.minio.service.port }}
-      targetPort: 9000
+    - name: minio-api
       protocol: TCP
-      name: http
+      port: 9000
+      targetPort: minio-api
+    - name: minio-dashboard
+      protocol: TCP
+      port: 9001
+      targetPort: minio-dashboard
   selector:
     {{- include "supabase.minio.selectorLabels" . | nindent 4 }}
 {{- end }}
