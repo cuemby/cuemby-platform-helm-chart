@@ -1,0 +1,104 @@
+apiVersion: v1
+entries:
+  configurator:
+  - apiVersion: v2
+    created: "2025-06-06T20:21:05.682556952Z"
+    dependencies:
+    - name: reloader
+      repository: https://stakater.github.io/stakater-charts
+      version: 1.0.104
+    description: The cuemby platform configurator
+    digest: 4f2cef53d071ad5018a29ddd4c8e2b9e11d606329efbda1c8e73ffbfdf62e65a
+    name: configurator
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/configurator-1.0.0.tgz
+    version: 1.0.0
+  cuemby-platform:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-06-06T20:21:05.690705412Z"
+    dependencies:
+    - name: supabase
+      repository: file://../cuemby-platform-core/supabase
+      version: 0.1.3
+    - name: walrus
+      repository: file://../cuemby-platform-core/walrus
+      version: 1.0.0
+    - name: configurator
+      repository: file://../cuemby-platform-core/configurator
+      version: 1.0.0
+    - name: platform
+      repository: file://../cuemby-platform-core/platform
+      version: 1.0.0
+    description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
+    digest: 4f7f4f5688e2529639a798a91e847caad35f1370a098de1c0ee4bc2fce9e034f
+    name: cuemby-platform
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/cuemby-platform-1.0.0.tgz
+    version: 1.0.0
+  harbor:
+  - apiVersion: v1
+    appVersion: 2.9.0
+    created: "2025-06-06T20:21:05.69318329Z"
+    description: An open source trusted cloud native registry that stores, signs,
+      and scans content
+    digest: 28fff02cb4e7c9a1b21f98702d274df828952c8f482b0a57d3bf7f058075e9f2
+    home: https://goharbor.io
+    icon: https://raw.githubusercontent.com/goharbor/website/main/static/img/logos/harbor-icon-color.png
+    keywords:
+    - docker
+    - registry
+    - harbor
+    maintainers:
+    - email: yinw@vmware.com
+      name: Wenkai Yin
+    - email: hweiwei@vmware.com
+      name: Weiwei He
+    - email: yshengwen@vmware.com
+      name: Shengwen Yu
+    name: harbor
+    sources:
+    - https://github.com/goharbor/harbor
+    - https://github.com/goharbor/harbor-helm
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/harbor-1.13.0.tgz
+    version: 1.13.0
+  platform:
+  - apiVersion: v2
+    created: "2025-06-06T20:21:05.696857296Z"
+    dependencies:
+    - name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.0.0
+    description: The platform is a service that provides the core functionalities
+      of the Cuemby Platform.
+    digest: a2a273ea2af09a5d82277e95e03bb26fda2c2f3bbac4a634a013480d78f21a0e
+    name: platform
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/platform-1.0.0.tgz
+    version: 1.0.0
+  supabase:
+  - apiVersion: v2
+    created: "2025-06-06T20:21:05.69985634Z"
+    description: The open source Firebase alternative.
+    digest: fdc2605d585b64d4beb8433cd6ef4410652d01b79c6418b20b30c902844be3fc
+    icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
+    name: supabase
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/supabase-0.1.3.tgz
+    version: 0.1.3
+  walrus:
+  - apiVersion: v2
+    created: "2025-06-06T20:21:05.700152835Z"
+    description: The walrus
+    digest: 1e93b17d9fc3d35a487d80340eba20234039c675e2c43338fe8a9d277c67888f
+    name: walrus
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/walrus-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-06-06T20:21:05.6813538Z"
