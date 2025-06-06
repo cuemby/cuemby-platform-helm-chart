@@ -8,4 +8,4 @@ iam:
   enabled: true
 
 minio:
-  enabled: true
+  enabled: false

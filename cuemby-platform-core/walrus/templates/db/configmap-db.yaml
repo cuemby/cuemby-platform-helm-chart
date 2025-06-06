@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  namespace: walrus-system
+  namespace: cuemby-platform
   name: database-script
 data:
   "init.sh": |

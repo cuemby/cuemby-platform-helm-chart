@@ -1,15 +1,15 @@
-{{- if .Values.walrus.enabled -}}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: walrus-system
-  labels:
-    "app.kubernetes.io/part-of": "walrus"
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: walrus-deployer
-  labels:
-    "app.kubernetes.io/part-of": "walrus"
-{{- end }}
+# {{- if .Values.walrus.enabled -}}
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: walrus-system
+#   labels:
+#     "app.kubernetes.io/part-of": "walrus"
+# ---
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: walrus-deployer
+#   labels:
+#     "app.kubernetes.io/part-of": "walrus"
+# {{- end }}

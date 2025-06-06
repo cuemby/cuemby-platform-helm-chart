@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: walrus-system
+  namespace: cuemby-platform
   name: walrus
   labels:
     "app.kubernetes.io/part-of": "walrus"
@@ -78,18 +78,49 @@ spec:
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
-                  name: walrus-secrets
-                  key: minio_root_user
+                  # name: walrus-secrets
+                  name: cuemby-core-supabase-s3
+                  # key: minio_root_user
+                  key: keyId
             - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: walrus-secrets
-                  key: minio_root_password
+                  name: cuemby-core-supabase-s3
+                  # key: minio_root_password
+                  key: accessKey
             - name: MINIO_BUCKET
-              valueFrom:
-                secretKeyRef:
-                  name: walrus-secrets
-                  key: minio_bucket
+              value: walrus
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: cuemby-core-supabase-s3
+              #     key: minio_bucket
+            - name: MINIO_SERVICE_HOST
+              value: cuemby-core-supabase-minio
+            - name: MINIO_PORT_9001_TCP_PROTO
+              value: tcp
+            - name: MINIO_PORT_9001_TCP_PORT
+              value: "9001"
+            - name: MINIO_PORT_9001_TCP_ADDR
+              value: $(MINIO_SERVICE_HOST)
+            - name: MINIO_PORT_9001_TCP
+              value: $(MINIO_PORT_9001_TCP_PROTO)://$(MINIO_SERVICE_HOST):$(MINIO_PORT_9001_TCP_PORT)
+            - name: MINIO_SERVICE_PORT_MINIO_DASHBOARD
+              value: $(MINIO_PORT_9001_TCP_PORT)
+            - name: MINIO_PORT_9000_TCP_ADDR
+              value: $(MINIO_SERVICE_HOST)
+            - name: MINIO_SERVICE_PORT
+              value: "9000"
+            - name: MINIO_SERVICE_PORT_MINIO_API
+              value: $(MINIO_SERVICE_PORT)
+            - name: MINIO_PORT_9000_TCP_PORT
+              value: $(MINIO_SERVICE_PORT)
+            - name: MINIO_PORT_9000_TCP_PROTO
+              value: tcp
+            - name: MINIO_PORT_9000_TCP
+              value: $(MINIO_PORT_9000_TCP_PROTO)://$(MINIO_SERVICE_HOST):$(MINIO_PORT_9000_TCP_PORT)
+            - name: MINIO_PORT
+              value: $(MINIO_PORT_9000_TCP_PROTO)://$(MINIO_SERVICE_HOST):$(MINIO_PORT_9000_TCP_PORT)
+
             - name: SERVER_SETTING_LOCAL_ENVIRONMENT_MODE
               valueFrom:
                 secretKeyRef:

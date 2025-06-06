@@ -10,7 +10,7 @@ The walrus
 |-----|------|---------|-------------|
 | db.enabled | bool | `true` |  |
 | iam.enabled | bool | `true` |  |
-| minio.enabled | bool | `true` |  |
+| minio.enabled | bool | `false` |  |
 | walrus.enabled | bool | `true` |  |
 
 ----------------------------------------------

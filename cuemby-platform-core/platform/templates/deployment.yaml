@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: cp-system
+  namespace: cuemby-platform
   name: platform
   labels:
     app.kubernetes.io/name: platform
@@ -52,7 +52,7 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             - name: RABBIT_URI
-              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq.default:5672"
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
           resources:
             limits:
               cpu: 2500m
