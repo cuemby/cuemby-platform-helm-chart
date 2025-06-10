@@ -55,6 +55,10 @@ spec:
               cpu: '500m'
               memory: '512Mi'
           env:
+            {{- range $key, $value := .Values.walrus.environment }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
             - name: DB_DRIVER
               valueFrom:
                 secretKeyRef:
@@ -75,25 +79,35 @@ spec:
                 secretKeyRef:
                   name: walrus-secrets
                   key: db_name
+            - name: DATABASE_PORT_5432_TCP_PROTO
+              value: tcp
+            - name: DATABASE_SERVICE_PORT
+              value: "5432"
+            - name: DATABASE_PORT_5432_TCP_PORT
+              value: $(DATABASE_SERVICE_PORT)
+            - name: DATABASE_PORT
+              value: $(DATABASE_PORT_5432_TCP_PROTO)://$(DATABASE_SERVICE_HOST):$(DATABASE_SERVICE_PORT)
+            - name: DATABASE_SERVICE_PORT_CONN
+              value: $(DATABASE_SERVICE_PORT)
+            - name: DATABASE_PORT_5432_TCP
+              value: $(DATABASE_PORT_5432_TCP_PROTO)://$(DATABASE_SERVICE_HOST):$(DATABASE_SERVICE_PORT)
+            - name: DATABASE_PORT_5432_TCP_ADDR
+              value: $(DATABASE_SERVICE_HOST)
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
-                  # name: walrus-secrets
                   name: cuemby-core-supabase-s3
-                  # key: minio_root_user
                   key: keyId
             - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: cuemby-core-supabase-s3
-                  # key: minio_root_password
                   key: accessKey
             - name: MINIO_BUCKET
-              value: walrus
-              # valueFrom:
-              #   secretKeyRef:
-              #     name: cuemby-core-supabase-s3
-              #     key: minio_bucket
+              valueFrom:
+                secretKeyRef:
+                  name: walrus-secrets
+                  key: minio_bucket
             - name: MINIO_SERVICE_HOST
               value: cuemby-core-supabase-minio
             - name: MINIO_PORT_9001_TCP_PROTO
@@ -132,7 +146,7 @@ spec:
                   name: walrus-secrets
                   key: enable_tls
             - name: SERVER_DATA_SOURCE_ADDRESS
-              value: $(DB_DRIVER)://$(DB_USER):$(DB_PASSWORD)@database:5432/$(DB_NAME)?sslmode=disable
+              value: $(DB_DRIVER)://$(DB_USER):$(DB_PASSWORD)@$(DATABASE_SERVICE_HOST):5432/$(DB_NAME)?sslmode=disable
             - name: SERVER_CASDOOR_SERVER
               value: http://identity-access-manager:8000
           ports:

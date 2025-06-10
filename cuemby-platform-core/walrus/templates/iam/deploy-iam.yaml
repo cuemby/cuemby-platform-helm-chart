@@ -32,6 +32,10 @@ spec:
           command:
             - /script/init.sh
           env:
+            {{- range $key, $value := .Values.iam.environment }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
             - name: DB_DRIVER
               valueFrom:
                 secretKeyRef:
@@ -53,7 +57,7 @@ spec:
                   name: walrus-secrets
                   key: db_name
             - name: DB_SOURCE
-              value: $(DB_DRIVER)://$(DB_USER):$(DB_PASSWORD)@database:5432/$(DB_NAME)?sslmode=disable
+              value: $(DB_DRIVER)://$(DB_USER):$(DB_PASSWORD)@$(DATABASE_SERVICE_HOST):5432/$(DB_NAME)?sslmode=disable
           volumeMounts:
             - name: script
               mountPath: /script
