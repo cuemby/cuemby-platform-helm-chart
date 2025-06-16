@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: cuemby-platform
+  namespace: cuemby-system
   name: platform
   labels:
     app.kubernetes.io/name: platform
@@ -43,9 +43,12 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: platform
+        - name: deletion-worker
+          ports:
+            - containerPort: 9081
           image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/deletionworker"]
           env:
             {{- range $key, $value := .Values.platform.environment }}
             - name: {{ $key }}
@@ -53,11 +56,98 @@ spec:
             {{- end }}
             - name: RABBIT_URI
               value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
-          resources:
-            limits:
-              cpu: 2500m
-              memory: 3Gi
-            requests:
-              cpu: 50m
-              memory: 64Mi
+            - name: POSTGRES_URI
+              value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+              # value: "{{ .Values.platform.environment.POSTGRES_URI }}"
+            - name: WALRUS_USERNAME
+              value: "admin"
+            - name: WALRUS_BASE_URL
+              value: "https://walrus:80"
+            - name: WALRUS_API_KEY
+              value: ""
+            - name: QUEUE_NAME_DELETION_WORKER
+              value: "deletion_worker"
+        - name: metrics
+          ports:
+            - containerPort: 9082
+          image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/metrics"]
+          env:
+            - name: API_KEY
+              value: ""
+            - name: VICTORIA_METRICS_API_URL
+              value: "http://vm:8428"
+        - name: logsvc
+          ports:
+            - containerPort: 9084
+          image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/logsvc"]
+          env:
+            - name: API_KEY
+              value: ""
+            - name: VICTORIA_LOGS_API_URL
+              value: "http://vm:8428"
+        - name: pauseworker
+          ports:
+            - containerPort: 9086
+          image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/pauseworker"]
+          env:
+            {{- range $key, $value := .Values.platform.environment }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: RABBIT_URI
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
+            - name: POSTGRES_URI
+              value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+        - name: webhooks
+          ports:
+            - containerPort: 9085
+          image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/webhooks"]
+          env:
+            - name: API_KEY
+              value: ""
+            - name: RABBIT_URI
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
+            - name: POSTGRES_URI
+              value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+            - name: REDIS_ADDR
+              value: "http://cuemby-core-redis:6379"
+            - name: REDIS_USERNAME
+              value: "default"
+            - name: REDIS_PASSWORD
+              value: {{ .Values.redis.auth.password | quote }}
+            - name: REDIS_WEBHOOK_DB
+              value: "55"
+        - name: api
+          ports:
+            - containerPort: 9080
+          image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/api"]
+          env:
+            - name: API_KEY
+              value: ""
+            - name: RABBIT_URI
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
+            - name: POSTGRES_URI
+              value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+            - name: MINIO_ACCESS_KEY_ID
+              value: ""
+            - name: MINIO_SECRET_ACCESS_KEY
+              value: ""
+            - name: MINIO_ENDPOINT
+              value: ""
+            - name: LOGS_URL
+              value: "http://platform:9084"
+            - name: METRICS_URL
+              value: "http://platform:9082"
+            - name: WEBHOOKS_URL
+              value: "http://platform:9085"
 {{- end }}
