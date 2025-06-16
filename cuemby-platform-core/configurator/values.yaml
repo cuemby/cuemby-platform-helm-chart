@@ -7,32 +7,33 @@ secret:
     clientId: ""
     clientSecret: ""
 
+reloader:
+  fullnameOverride: reloader
+
 configurator:
   enabled: true
   dockerconfig:
-    registry: ""
+    registry: "harbor.cuemby.io"
     username: ""
     password: ""
   imagePullSecrets:
     - name: credentials-registry
   image:
-    repository: ""
+    repository: harbor.cuemby.io/cuemby-platform/cp-configurator
     pullPolicy: IfNotPresent
-    tag: ""
+    tag: "v2.0.59-dev.7"
   environment:
-    # SupabaseDB
     PGPASSWORD: ""
-    PGUSERNAME: ""
-    DATABASE_NAME: ""
-    PGPORT: ""
-    PGHOST: ""
-    GITHUB_CLIENT_SECRET: ""
+    PGUSERNAME: "supabase_admin"
+    DATABASE_NAME: "postgres"
+    PGPORT: "5432"
+    PGHOST: "cuemby-core-supabase-db"
+    WALRUS_NAMESPACE: walrus-system
+    SUPABASE_NAMESPACE: cuemby-system
     GITHUB_CLIENT_ID: ""
-    WALRUS_NAMESPACE: ""
-    WALRUS_SERVICE_NAME: ""
-    WALRUS_BASE_URL: ""
-    SUPABASE_FUNCTIONS_CP_CONFIG_MAP_NAME: ""
-    SUPABASE_NAMESPACE: "default"
-    SUPABASE_SERVICE_NAME: ""
-    SUPABASE_FUNCTION_SERVICE_NAME: ""
-    SUPABASE_DB_SERVICE_NAME: ""
+    GITHUB_CLIENT_SECRET: ""
+    WALRUS_SERVICE_NAME: "walrus"
+    SUPABASE_FUNCTIONS_CP_CONFIG_MAP_NAME: "cuemby-core-supabase-functions-cp-config"
+    SUPABASE_SERVICE_NAME: "cuemby-core-supabase-functions"
+    SUPABASE_FUNCTION_SERVICE_NAME: "cuemby-core-supabase-functions"
+    SUPABASE_DB_SERVICE_NAME: "cuemby-core-supabase-db"
