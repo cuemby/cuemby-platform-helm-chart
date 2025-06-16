@@ -4,7 +4,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cp-configurator
-  namespace: cuemby-platform
+  namespace: cuemby-system
 spec:
   backoffLimit: 4 # Number of retries before the job is considered failed
   activeDeadlineSeconds: 900 # Maximum time the job can run (15 minutes)
