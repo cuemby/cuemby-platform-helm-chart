@@ -51,6 +51,16 @@ spec:
                   {{- end }}
             - name: DB_PORT
               value: {{ .Values.analytics.environment.DB_PORT | quote }}
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.secret.db.secretRef }}
+                  name: {{ .Values.secret.db.secretRef }}
+                  key: {{ .Values.secret.db.secretRefKey.database | default "database" }}
+                  {{- else }}
+                  name: {{ include "supabase.secret.db" . }}
+                  key: database
+                  {{- end }}
           command: ["/bin/sh", "-c"]
           args:
             - |
@@ -74,6 +84,26 @@ spec:
             - name: DB_HOSTNAME
               value: {{ include "supabase.db.fullname" . }}
             {{- end }}
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.secret.db.secretRef }}
+                  name: {{ .Values.secret.db.secretRef }}
+                  key: {{ .Values.secret.db.secretRefKey.username | default "username" }}
+                  {{- else }}
+                  name: {{ include "supabase.secret.db" . }}
+                  key: username
+                  {{- end }}
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.secret.db.secretRef }}
+                  name: {{ .Values.secret.db.secretRef }}
+                  key: {{ .Values.secret.db.secretRefKey.username | default "username" }}
+                  {{- else }}
+                  name: {{ include "supabase.secret.db" . }}
+                  key: username
+                  {{- end }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -121,7 +151,7 @@ spec:
               value: {{ .Values.analytics.bigQuery.projectNumber | quote }}
             {{- else }}
             - name: POSTGRES_BACKEND_URL
-              value: $(DB_DRIVER)://$(DB_USERNAME):$(DB_PASSWORD_ENC)@$(DB_HOSTNAME):$(DB_PORT)/$(DB_DATABASE)
+              value: $(DB_DRIVER)://$(DB_USERNAME):$(DB_PASSWORD_ENC)@$(DB_HOSTNAME):$(DB_PORT)/$(DB_DATABASE)?search_path=analytics&sslmode={{ .Values.analytics.sslMode | default "disable" }}
             - name: POSTGRES_BACKEND_SCHEMA
               value: $(DB_SCHEMA)
             - name: LOGFLARE_FEATURE_FLAG_OVERRIDE

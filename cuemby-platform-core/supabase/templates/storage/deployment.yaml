@@ -61,7 +61,10 @@ spec:
               done
             - echo "Database is ready"
         {{- if .Values.minio.enabled }}
-        - env:
+        - name: init-bucket
+          image: minio/mc
+          imagePullPolicy: IfNotPresent
+          env:
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
@@ -72,9 +75,6 @@ spec:
                 secretKeyRef:
                   name: {{ include "supabase.secret.s3" . }}
                   key: accessKey
-          name: init-bucket
-          image: minio/mc
-          imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - -c
