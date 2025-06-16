@@ -1,8 +1,8 @@
 {{- if .Values.walrus.enabled -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  namespace: cuemby-platform
+  namespace: walrus-system
   name: walrus
   labels:
     "app.kubernetes.io/part-of": "walrus"
@@ -96,20 +96,20 @@ spec:
             - name: MINIO_ROOT_USER
               valueFrom:
                 secretKeyRef:
-                  name: cuemby-core-supabase-s3
-                  key: keyId
+                  name: walrus-secrets
+                  key: minio_root_user
             - name: MINIO_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cuemby-core-supabase-s3
-                  key: accessKey
+                  name: walrus-secrets
+                  key: minio_root_password
             - name: MINIO_BUCKET
               valueFrom:
                 secretKeyRef:
                   name: walrus-secrets
                   key: minio_bucket
             - name: MINIO_SERVICE_HOST
-              value: cuemby-core-supabase-minio
+              value: cuemby-core-supabase-minio.cuemby-system.svc.cluster.local
             - name: MINIO_PORT_9001_TCP_PROTO
               value: tcp
             - name: MINIO_PORT_9001_TCP_PORT
@@ -134,12 +134,19 @@ spec:
               value: $(MINIO_PORT_9000_TCP_PROTO)://$(MINIO_SERVICE_HOST):$(MINIO_PORT_9000_TCP_PORT)
             - name: MINIO_PORT
               value: $(MINIO_PORT_9000_TCP_PROTO)://$(MINIO_SERVICE_HOST):$(MINIO_PORT_9000_TCP_PORT)
+            - name: SERVER_S3_SOURCE_ADDRESS
+              value: s3://$(MINIO_ROOT_USER):$(MINIO_ROOT_PASSWORD)@$(MINIO_SERVICE_HOST):9000/$(MINIO_BUCKET)?sslmode=disable
 
             - name: SERVER_SETTING_LOCAL_ENVIRONMENT_MODE
               valueFrom:
                 secretKeyRef:
                   name: walrus-secrets
                   key: local_environment_mode
+            - name: SERVER_SETTING_DEPLOYER_IMAGE
+              valueFrom:
+                secretKeyRef:
+                  name: walrus-secrets
+                  key: SERVER_SETTING_DEPLOYER_IMAGE
             - name: SERVER_ENABLE_TLS
               valueFrom:
                 secretKeyRef:
@@ -148,7 +155,33 @@ spec:
             - name: SERVER_DATA_SOURCE_ADDRESS
               value: $(DB_DRIVER)://$(DB_USER):$(DB_PASSWORD)@$(DATABASE_SERVICE_HOST):5432/$(DB_NAME)?sslmode=disable
             - name: SERVER_CASDOOR_SERVER
-              value: http://identity-access-manager:8000
+              value: http://identity-access-manager.walrus-system.svc.cluster.local:8000
+            - name: WALRUS_MIRROR_HERMITCRAB_SERVICE_HOST
+              value: walrus-mirror-hermitcrab.walrus-system.svc.cluster.local
+            - name: WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTPS
+              value: "443"
+            - name: WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTP
+              value: "80"
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_443_TCP_PROTO
+              value: tcp
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_80_TCP_PROTO
+              value: tcp
+            - name: WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT
+              value: $(WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTP)
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT
+              value: $(WALRUS_MIRROR_HERMITCRAB_PORT_80_TCP_PROTO)://$(WALRUS_MIRROR_HERMITCRAB_SERVICE_HOST):$(WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTP)
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_80_TCP_PORT
+              value: $(WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTP)
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_443_TCP_ADDR
+              value: $(WALRUS_MIRROR_HERMITCRAB_SERVICE_HOST)
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_80_TCP
+              value: $(WALRUS_MIRROR_HERMITCRAB_PORT_80_TCP_PROTO)://$(WALRUS_MIRROR_HERMITCRAB_SERVICE_HOST):$(WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTP)
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_443_TCP_PORT
+              value: $(WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTPS)
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_80_TCP_ADDR
+              value: $(WALRUS_MIRROR_HERMITCRAB_SERVICE_HOST)
+            - name: WALRUS_MIRROR_HERMITCRAB_PORT_443_TCP
+              value: $(WALRUS_MIRROR_HERMITCRAB_PORT_443_TCP_PROTO)://$(WALRUS_MIRROR_HERMITCRAB_SERVICE_HOST):$(WALRUS_MIRROR_HERMITCRAB_SERVICE_PORT_HTTPS)
           ports:
             - name: http
               containerPort: 80

@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: cuemby-platform
-  name: walrus
+  namespace: walrus-system
+  name: walrus-handless
   labels:
     "app.kubernetes.io/part-of": "walrus"
     "app.kubernetes.io/component": "walrus"
@@ -12,7 +12,29 @@ spec:
     "app.kubernetes.io/part-of": "walrus"
     "app.kubernetes.io/component": "walrus"
   sessionAffinity: ClientIP
-  type: NodePort
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+    - name: https
+      port: 443
+      targetPort: https
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: walrus-system
+  name: walrus
+  labels:
+    "app.kubernetes.io/part-of": "walrus"
+    "app.kubernetes.io/component": "walrus"
+spec:
+  type: ClusterIP
+  sessionAffinity: ClientIP
+  selector:
+    "app.kubernetes.io/part-of": "walrus"
+    "app.kubernetes.io/component": "walrus"
   ports:
     - name: http
       port: 80
