@@ -2,18 +2,22 @@ apiVersion: v1
 entries:
   configurator:
   - apiVersion: v2
-    created: "2025-06-03T14:21:54.614779-05:00"
+    created: "2025-06-16T17:59:39.059334-05:00"
+    dependencies:
+    - name: reloader
+      repository: https://stakater.github.io/stakater-charts
+      version: 1.0.104
     description: The cuemby platform configurator
-    digest: ae48e10ce012566ea3698a0fbed831c646fb6e75bf9a5b40ca4c52fd4531fd58
+    digest: 50de9e605921eb85e116e25673c50acc376dfb366fec0cfee73cbd8485a91c74
     name: configurator
     type: application
     urls:
-    - https://cuemby.github.io/cuemby-platform-helm-chart/configurator-1.0.0.tgz
+    - configurator-1.0.0.tgz
     version: 1.0.0
   cuemby-platform:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-06-03T14:21:54.621079-05:00"
+    created: "2025-06-16T17:59:39.073314-05:00"
     dependencies:
     - name: supabase
       repository: file://../cuemby-platform-core/supabase
@@ -27,74 +31,55 @@ entries:
     - name: platform
       repository: file://../cuemby-platform-core/platform
       version: 1.0.0
+    - alias: registry
+      condition: registry.enabled
+      name: harbor
+      repository: https://helm.goharbor.io
+      version: 1.14.0
     description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
-    digest: a26dcc735af6e6fb55e1f1615732c227197d5c2df84d0f72483bb6b5c44c1cbe
+    digest: 7e908cda87d18ccde0b5676e184330ceff6c963d78dae77fef898f9bdcd26943
     name: cuemby-platform
     type: application
     urls:
-    - https://cuemby.github.io/cuemby-platform-helm-chart/cuemby-platform-1.0.0.tgz
+    - cuemby-platform-1.0.0.tgz
     version: 1.0.0
-  harbor:
-  - apiVersion: v1
-    appVersion: 2.9.0
-    created: "2025-06-03T14:21:54.622717-05:00"
-    description: An open source trusted cloud native registry that stores, signs,
-      and scans content
-    digest: e1a972f9198a2b7ea1b889c7a69f9eb7af844c417ad63ece274a244841feb17e
-    home: https://goharbor.io
-    icon: https://raw.githubusercontent.com/goharbor/website/main/static/img/logos/harbor-icon-color.png
-    keywords:
-    - docker
-    - registry
-    - harbor
-    maintainers:
-    - email: yinw@vmware.com
-      name: Wenkai Yin
-    - email: hweiwei@vmware.com
-      name: Weiwei He
-    - email: yshengwen@vmware.com
-      name: Shengwen Yu
-    name: harbor
-    sources:
-    - https://github.com/goharbor/harbor
-    - https://github.com/goharbor/harbor-helm
-    urls:
-    - https://cuemby.github.io/cuemby-platform-helm-chart/harbor-1.13.0.tgz
-    version: 1.13.0
   platform:
   - apiVersion: v2
-    created: "2025-06-03T14:21:54.624891-05:00"
+    created: "2025-06-16T17:59:39.080513-05:00"
     dependencies:
     - name: rabbitmq
       repository: https://charts.bitnami.com/bitnami
       version: 12.0.0
+    - name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.11.3
     description: The platform is a service that provides the core functionalities
       of the Cuemby Platform.
-    digest: 418e971f15e2528d4e7d7fc10a8f852477ff7a7f5b9e0f7e6ae28162b4ca0e38
+    digest: 9fc6c29beec05df2d50d94870edecd882dcd6b157f057f9788be27149f682f31
     name: platform
     type: application
     urls:
-    - https://cuemby.github.io/cuemby-platform-helm-chart/platform-1.0.0.tgz
+    - platform-1.0.0.tgz
     version: 1.0.0
   supabase:
   - apiVersion: v2
-    created: "2025-06-03T14:21:54.628037-05:00"
+    created: "2025-06-16T17:59:39.084262-05:00"
     description: The open source Firebase alternative.
-    digest: 344e7eeaa2a74ace98e7b6bc3f78039130a5212a7af75be00bdae055712d2768
+    digest: 9919331e61a22f9385a9c2030a25b1db4445a1bb90e4cc1b0200fd314640e67c
     icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
     name: supabase
     type: application
     urls:
-    - https://cuemby.github.io/cuemby-platform-helm-chart/supabase-0.1.3.tgz
+    - supabase-0.1.3.tgz
     version: 0.1.3
   walrus:
   - apiVersion: v2
-    created: "2025-06-03T14:21:54.628248-05:00"
+    created: "2025-06-16T17:59:39.084532-05:00"
     description: The walrus
-    digest: 6e1c651c91f3c98e7644e552f638d451ee0b02be991b47870b8036c4906eb6e9
+    digest: d259c0dcaa352488939e706a9b91a9beed8b8875a4023e16d94778d6ab842bfc
     name: walrus
     type: application
     urls:
-    - https://cuemby.github.io/cuemby-platform-helm-chart/walrus-1.0.0.tgz
+    - walrus-1.0.0.tgz
     version: 1.0.0
-generated: "2025-06-03T14:21:54.614306-05:00"
+generated: "2025-06-16T17:59:39.058274-05:00"

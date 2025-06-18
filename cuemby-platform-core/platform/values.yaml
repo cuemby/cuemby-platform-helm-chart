@@ -19,6 +19,15 @@ rabbitmq:
   readinessProbe:
     enabled: true
 
+redis:
+  architecture: standalone
+  auth:
+    enabled: true
+    username: ""
+    password: ""
+  commonConfiguration: |-
+    databases 100
+
 platform:
   name: "platform"
   enabled: true
@@ -32,18 +41,22 @@ platform:
   imagePullSecrets:
     - name: credentials-registry
   image:
-    repository: ""
+    repository: harbor.cuemby.io/cuemby-platform/cp-platform
     pullPolicy: Always
-    tag: ""
+    tag: "v1.0.33-dev.23"
   environment:
-    POSTGRES_URI: ""
-    # RABBIT_URI: "amqp://guest:password@localhost:5672"
+    DB_USERNAME: ""
+    DB_PASSWORD: ""
+    DB_DATABASE: "postgres"
+    DB_HOST: "cuemby-core-supabase-db"
+    DB_PORT: "5432"
+    # RABBIT_URI: "amqp://guest:[PASSWORD]@localhost:5672"
     API_KEY: ""
-    MINIO_ENDPOINT: ""
-    MINIO_ACCESS_KEY_ID: ""
-    MINIO_SECRET_ACCESS_KEY: ""
-    QUEUE_NAME_DELETION_WORKER: "deletion_worker_stg"
-    REDIS_ADDR: ""
-    REDIS_USERNAME: "default"
-    REDIS_PASSWORD: ""
-    REDIS_WEBHOOK_DB: "15"
+
+    HARBOR_BASE_URL: "https://harbor.cuemby.io/api/v2.0"
+    HARBOR_USERNAME: ""
+    HARBOR_PASSWORD: ""
+    # REDIS_ADDR: "redis.sp.cuemby.io:6379"
+    # REDIS_USERNAME: "default"
+    # REDIS_PASSWORD: ""
+    # REDIS_WEBHOOK_DB: "15"

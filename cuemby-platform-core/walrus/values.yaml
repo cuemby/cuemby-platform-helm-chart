@@ -1,11 +1,13 @@
 walrus:
   enabled: true
-
-db:
-  enabled: true
+  environment:
+    DATABASE_SERVICE_HOST: "cuemby-core-supabase-db.cuemby-system.svc.cluster.local"
+  ingress:
+    hosts:
+      core: walrus.netsaj.uk
+    className: cloudflare-tunnel
 
 iam:
   enabled: true
-
-minio:
-  enabled: false
+  environment:
+    DATABASE_SERVICE_HOST: "cuemby-core-supabase-db.cuemby-system.svc.cluster.local"

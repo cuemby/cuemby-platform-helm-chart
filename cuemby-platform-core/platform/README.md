@@ -9,6 +9,7 @@ The platform is a service that provides the core functionalities of the Cuemby P
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | rabbitmq | 12.0.0 |
+| https://charts.bitnami.com/bitnami | redis | 17.11.3 |
 
 ## Values
 
@@ -19,18 +20,17 @@ The platform is a service that provides the core functionalities of the Cuemby P
 | platform.dockerconfig.username | string | `""` |  |
 | platform.enabled | bool | `true` |  |
 | platform.environment.API_KEY | string | `""` |  |
-| platform.environment.MINIO_ACCESS_KEY_ID | string | `""` |  |
-| platform.environment.MINIO_ENDPOINT | string | `""` |  |
-| platform.environment.MINIO_SECRET_ACCESS_KEY | string | `""` |  |
-| platform.environment.POSTGRES_URI | string | `""` |  |
-| platform.environment.QUEUE_NAME_DELETION_WORKER | string | `"deletion_worker_stg"` |  |
-| platform.environment.REDIS_ADDR | string | `""` |  |
-| platform.environment.REDIS_PASSWORD | string | `""` |  |
-| platform.environment.REDIS_USERNAME | string | `"default"` |  |
-| platform.environment.REDIS_WEBHOOK_DB | string | `"15"` |  |
+| platform.environment.DB_DATABASE | string | `"postgres"` |  |
+| platform.environment.DB_HOST | string | `"cuemby-core-supabase-db"` |  |
+| platform.environment.DB_PASSWORD | string | `""` |  |
+| platform.environment.DB_PORT | string | `"5432"` |  |
+| platform.environment.DB_USERNAME | string | `""` |  |
+| platform.environment.HARBOR_BASE_URL | string | `"https://harbor.cuemby.io/api/v2.0"` |  |
+| platform.environment.HARBOR_PASSWORD | string | `""` |  |
+| platform.environment.HARBOR_USERNAME | string | `""` |  |
 | platform.image.pullPolicy | string | `"Always"` |  |
-| platform.image.repository | string | `""` |  |
-| platform.image.tag | string | `""` |  |
+| platform.image.repository | string | `"harbor.cuemby.io/cuemby-platform/cp-platform"` |  |
+| platform.image.tag | string | `"v1.0.33-dev.23"` |  |
 | platform.imagePullSecrets[0].name | string | `"credentials-registry"` |  |
 | platform.name | string | `"platform"` |  |
 | platform.service.port | int | `9080` |  |
@@ -41,6 +41,11 @@ The platform is a service that provides the core functionalities of the Cuemby P
 | rabbitmq.livenessProbe.enabled | bool | `true` |  |
 | rabbitmq.readinessProbe.enabled | bool | `true` |  |
 | rabbitmq.service.type | string | `"ClusterIP"` |  |
+| redis.architecture | string | `"standalone"` |  |
+| redis.auth.enabled | bool | `true` |  |
+| redis.auth.password | string | `""` |  |
+| redis.auth.username | string | `""` |  |
+| redis.commonConfiguration | string | `"databases 100"` |  |
 | secret.db.database | string | `""` |  |
 | secret.db.password | string | `""` |  |
 | secret.db.username | string | `""` |  |

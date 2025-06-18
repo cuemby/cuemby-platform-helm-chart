@@ -11,5 +11,8 @@ dependencies:
 - name: platform
   repository: file://../cuemby-platform-core/platform
   version: 1.0.0
-digest: sha256:f92e2b5366a3d051dc304e52895bc4df77a47794467cbdb7180c8887efff6b22
-generated: "2025-06-02T09:49:09.645213-05:00"
+- name: harbor
+  repository: https://helm.goharbor.io
+  version: 1.14.0
+digest: sha256:73a0291b60a34b44ea7f4042243bd8cf8a83a1444660bc250ec33bfbeb53a557
+generated: "2025-06-10T15:20:16.474423-05:00"
