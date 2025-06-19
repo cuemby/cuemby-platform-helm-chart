@@ -22,7 +22,7 @@ package_chart() {
 }
 
 # Packaging individual charts (core and registry)
-for dir in cuemby-platform-core/* cuemby-platform-registry/*; do
+for dir in cuemby-platform-core/* ; do
   package_chart "$dir"
 done
 
