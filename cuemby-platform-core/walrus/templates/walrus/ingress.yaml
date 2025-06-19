@@ -7,8 +7,16 @@ metadata:
   labels:
     "app.kubernetes.io/part-of": "walrus"
     "app.kubernetes.io/component": "entrance"
+  {{- with .Values.walrus.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   ingressClassName: {{ .Values.walrus.ingress.className }}
+  tls:
+  - hosts:
+    - {{ .Values.walrus.ingress.hosts.core }}
+    secretName: walrus.netsaj.sh-tls
   rules:
     - host: {{ .Values.walrus.ingress.hosts.core }}
       http:

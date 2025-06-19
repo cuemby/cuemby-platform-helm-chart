@@ -1,5 +1,4 @@
 {{- if .Values.configurator.enabled -}}
-# Crear initContainer para la validacion de que ya esten listos para recibir peticiones de los servicio o pods (walrus, supabase-configMap)
 apiVersion: batch/v1
 kind: Job
 metadata:

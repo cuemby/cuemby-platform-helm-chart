@@ -27,13 +27,13 @@ configurator:
     PGUSERNAME: "supabase_admin"
     DATABASE_NAME: "postgres"
     PGPORT: "5432"
-    PGHOST: "cuemby-core-supabase-db"
+    PGHOST: "cuemby-platform-core-db"
     WALRUS_NAMESPACE: walrus-system
     SUPABASE_NAMESPACE: cuemby-system
     GITHUB_CLIENT_ID: ""
     GITHUB_CLIENT_SECRET: ""
     WALRUS_SERVICE_NAME: "walrus"
-    SUPABASE_FUNCTIONS_CP_CONFIG_MAP_NAME: "cuemby-core-supabase-functions-cp-config"
-    SUPABASE_SERVICE_NAME: "cuemby-core-supabase-functions"
-    SUPABASE_FUNCTION_SERVICE_NAME: "cuemby-core-supabase-functions"
-    SUPABASE_DB_SERVICE_NAME: "cuemby-core-supabase-db"
+    SUPABASE_FUNCTIONS_CP_CONFIG_MAP_NAME: "cuemby-platform-core-functions-cp-config"
+    SUPABASE_SERVICE_NAME: "cuemby-platform-core-functions"
+    SUPABASE_FUNCTION_SERVICE_NAME: "cuemby-platform-core-functions"
+    SUPABASE_DB_SERVICE_NAME: "cuemby-platform-core-db"

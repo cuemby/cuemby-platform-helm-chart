@@ -109,7 +109,7 @@ spec:
                   name: walrus-secrets
                   key: minio_bucket
             - name: MINIO_SERVICE_HOST
-              value: cuemby-core-supabase-minio.cuemby-system.svc.cluster.local
+              value: cuemby-platform-core-minio.cuemby-system.svc.cluster.local
             - name: MINIO_PORT_9001_TCP_PROTO
               value: tcp
             - name: MINIO_PORT_9001_TCP_PORT
@@ -152,6 +152,8 @@ spec:
                 secretKeyRef:
                   name: walrus-secrets
                   key: enable_tls
+            - name: SERVER_SETTING_SERVE_URL
+              value: http://walrus.walrus-system.svc.cluster.local:80
             - name: SERVER_DATA_SOURCE_ADDRESS
               value: $(DB_DRIVER)://$(DB_USER):$(DB_PASSWORD)@$(DATABASE_SERVICE_HOST):5432/$(DB_NAME)?sslmode=disable
             - name: SERVER_CASDOOR_SERVER

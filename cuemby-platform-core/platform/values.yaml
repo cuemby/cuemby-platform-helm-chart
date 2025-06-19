@@ -48,7 +48,7 @@ platform:
     DB_USERNAME: ""
     DB_PASSWORD: ""
     DB_DATABASE: "postgres"
-    DB_HOST: "cuemby-core-supabase-db"
+    DB_HOST: "cuemby-platform-core-db"
     DB_PORT: "5432"
     # RABBIT_URI: "amqp://guest:[PASSWORD]@localhost:5672"
     API_KEY: ""

@@ -9,8 +9,8 @@ Meta chart que instala todos los componentes obligatorios de cuemby-platform-cor
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../cuemby-platform-core/configurator | configurator | 1.0.0 |
+| file://../cuemby-platform-core/core | core | 0.1.3 |
 | file://../cuemby-platform-core/platform | platform | 1.0.0 |
-| file://../cuemby-platform-core/supabase | supabase | 0.1.3 |
 | file://../cuemby-platform-core/walrus | walrus | 1.0.0 |
 | https://helm.goharbor.io | registry(harbor) | 1.14.0 |
 
