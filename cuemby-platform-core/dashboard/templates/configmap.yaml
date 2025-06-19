@@ -8,6 +8,6 @@ data:
     {
       "API_URL": "",
       "SUPA_ANON": "",
-      "STRIPE_PUB": ""
+      "STRIPE_PUB": {{ .Values.stripe.publicKey | quote }},
     }
 {{- end }}

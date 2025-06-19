@@ -19,6 +19,5 @@ dashboard:
     limits:
       cpu: "100m"
       memory: "128Mi"
-billing:
-  enabled: false
-  stripePubKey: ""
+stripe:
+  publicKey: ""
