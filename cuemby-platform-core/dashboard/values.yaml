@@ -1,0 +1,31 @@
+dashboard:
+  enabled: true
+  image:
+    repository: harbor.cuemby.io/cuemby-platform/cp-dashboard
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: false
+    ingressClassName: ngnix
+    host: dashboard.netsaj.sh
+    annotations: 
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
+      external-dns.alpha.kubernetes.io/hostname: dashboard.netsaj.sh
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+      cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    tls:
+      - hosts:
+          - dashboard.netsaj.sh
+        secretName: dashboard-netsaj-sh-tls
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "64Mi"
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+  stripe:
+    publicKey: ""

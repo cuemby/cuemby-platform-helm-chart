@@ -1,0 +1,22 @@
+{{- if .Values.dashboard.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: cuemby-system
+  name: dashboard-service
+  labels:
+    app.kubernetes.io/name: dashboard-service
+    app.kubernetes.io/part-of: "dashboard-service"
+    app.kubernetes.io/component: "dashboard-service"
+spec:
+  selector:
+    app.kubernetes.io/name: dashboard-service
+    app.kubernetes.io/part-of: "dashboard-service"
+    app.kubernetes.io/component: "dashboard-service"
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+{{- end }}

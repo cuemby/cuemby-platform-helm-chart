@@ -1,0 +1,5 @@
+apiVersion: v2
+name: dashboard
+description: The dashboard for the Cuemby Platform, providing a user interface for managing and monitoring the platform's components.
+type: application
+version: 1.0.0
