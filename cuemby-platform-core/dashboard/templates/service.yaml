@@ -13,12 +13,10 @@ spec:
     app.kubernetes.io/name: dashboard-service
     app.kubernetes.io/part-of: "dashboard-service"
     app.kubernetes.io/component: "dashboard-service"
-  sessionAffinity: ClientIP
-  type: {{ .Values.dashboard.service.type }}
+  type: ClusterIP
   ports:
-    - name: port-3000
+    - name: http
       protocol: TCP
-      port: {{ .Values.dashboard.service.port }}
-      targetPort: 3000
-      nodePort: 32610
+      port: 80
+      targetPort: 80
 {{- end }}
