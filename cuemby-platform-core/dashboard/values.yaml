@@ -1,0 +1,24 @@
+dashboard:
+  enabled: true
+  image:
+    repository: harbor.cuemby.io/cuemby-platform/cp-dashboard
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: false
+    hosts:
+      - host: dashboard.example.com
+        paths:
+          - /
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "64Mi"
+    limits:
+      cpu: "100m"
+      memory: "128Mi"
+billing:
+  enabled: false
+  stripePubKey: ""
