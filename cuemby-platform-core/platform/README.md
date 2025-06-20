@@ -21,7 +21,7 @@ The platform is a service that provides the core functionalities of the Cuemby P
 | platform.enabled | bool | `true` |  |
 | platform.environment.API_KEY | string | `""` |  |
 | platform.environment.DB_DATABASE | string | `"postgres"` |  |
-| platform.environment.DB_HOST | string | `"cuemby-core-supabase-db"` |  |
+| platform.environment.DB_HOST | string | `"cuemby-platform-core-db"` |  |
 | platform.environment.DB_PASSWORD | string | `""` |  |
 | platform.environment.DB_PORT | string | `"5432"` |  |
 | platform.environment.DB_USERNAME | string | `""` |  |

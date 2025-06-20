@@ -1,0 +1,37 @@
+{{- if .Values.minio.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: cuemby-system
+  name: minio
+  labels:
+    "app.kubernetes.io/part-of": "minio"
+    "app.kubernetes.io/component": "entrance"
+  {{- with .Values.minio.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.minio.ingress.className }}
+  {{- if .Values.minio.ingress.tls }}
+  tls:
+    {{- range .Values.minio.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.minio.ingress.host }}
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: minio
+              port:
+                number: 80
+{{- end }}

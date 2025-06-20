@@ -55,7 +55,7 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             - name: RABBIT_URI
-              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
               # value: "{{ .Values.platform.environment.POSTGRES_URI }}"
@@ -101,7 +101,7 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
             - name: RABBIT_URI
-              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
         - name: webhooks
@@ -114,11 +114,11 @@ spec:
             - name: API_KEY
               value: ""
             - name: RABBIT_URI
-              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
             - name: REDIS_ADDR
-              value: "http://cuemby-core-redis:6379"
+              value: "http://cuemby-platform-redis:6379"
             - name: REDIS_USERNAME
               value: "default"
             - name: REDIS_PASSWORD
@@ -135,7 +135,7 @@ spec:
             - name: API_KEY
               value: ""
             - name: RABBIT_URI
-              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-core-rabbitmq:5672"
+              value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
             - name: MINIO_ACCESS_KEY_ID

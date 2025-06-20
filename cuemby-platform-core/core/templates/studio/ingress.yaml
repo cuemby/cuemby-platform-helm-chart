@@ -5,10 +5,16 @@ metadata:
   name: {{ include "supabase.studio.fullname" . }}-ingress
   labels:
     {{- include "supabase.labels" . | nindent 4 }}
+  {{- with .Values.studio.ingress.annotations }}
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false" # Cambia a "true" si usas HTTPS
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
+  ingressClassName: {{ .Values.studio.ingress.className }}
+  tls:
+    - hosts:
+        - {{ .Values.studio.ingress.host }}
+      secretName: {{ include "supabase.studio.fullname" . }}-tls
   rules:
     - host: {{ .Values.studio.environment.SUPABASE_PUBLIC_URL | trimPrefix "http://" | trimPrefix "https://" }}
       http:

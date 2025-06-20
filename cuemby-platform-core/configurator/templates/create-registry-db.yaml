@@ -16,7 +16,7 @@ spec:
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: cuemby-core-supabase-db
+                  name: cuemby-platform-core-db
                   key: password
             - name: PGHOST
               value: {{ .Values.configurator.environment.PGHOST | quote }}
