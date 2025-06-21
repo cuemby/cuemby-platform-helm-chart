@@ -1,144 +1,60 @@
-# File structure of values.yaml:
-# |-- 1.  Database
-# |-- 2.  Studio
-# |-- 3.  Auth
-# |-- 4.  Rest
-# |-- 5.  Realtime
-# |-- 6.  Meta
-# |-- 7.  Storage
-# |-- 8.  Image Proxy
-# |-- 9.  Kong
-# |-- 10. Analytics
-# |-- 11. Vector
-# |-- 12. Functions
-# |-- 13. Minio
-
 secret:
-  # jwt will be used to reference secret in multiple services:
-  # Anon & Service key: Studio, Storage, Kong
-  # JWT Secret: Analytics, Auth, Rest, Realtime, Storage
   jwt:
     anonKey: ""
     serviceKey: ""
     secret: ""
-    # specify existing secret, which takes precedence over variables above
-    secretRef: ""
-    # override secret keys for existing secret refs
-    secretRefKey:
-      anonKey: anonKey
-      serviceKey: serviceKey
-      secret: secret
-  # database credentials
-  # these fields must be provided even if using external database
-  db:
-    username: ""
+  smtp:
+    username: resend
     password: ""
-    database: ""
-    # specify existing secret, which takes precedence over variables above
-    secretRef: ""
-    # override secret keys for existing secret refs
-    secretRefKey:
-      username: username
-      password: password
-      database: database
-  # analytics Logflare API key
+  dashboard:
+    username: supabase
+    password: ""
+  db:
+    username: supabase_admin
+    password: ""
+    database: postgres
   analytics:
     apiKey: ""
-    # specify existing secret, which takes precedence over variable above
-    secretRef: ""
-    # override secret keys for existing secret refs
-    secretRefKey:
-      apiKey: apiKey
-  # smtp will be used to reference secret including smtp credentials
-  smtp:
-    # username: ""
-    # password: ""
-    # specify existing secret, which takes precedence over variables above
-    # secretRef: ""
-    # override secret keys for existing secret refs
-    secretRefKey:
-      username: username
-      password: password
-  # secret used to access the studio dashboard
-  # leave it empty to disable dashboard authentication
-  dashboard:
-    # username: ""
-    # password: ""
-    # specify existing secret, which takes precedence over variables above
-    # secretRef: ""
-    # override secret keys for existing secret refs
-    secretRefKey:
-      username: username
-      password: password
-  # S3 credentials for storage object bucket
   s3:
-    # keyId: ""
-    # accessKey: ""
-    # specify existing secret, which takes precedence over variables above
-    # secretRef: ""
-    # override secret keys for existing secret refs
-    secretRefKey:
-      keyId: keyId
-      accessKey: accessKey
+    keyId: ""
+    accessKey: ""
+    secretKey: ""
+    bucket: ""
+    region: ""
+    endpoint: ""
+    cdnUrl: ""
+  git:
+    repoUrl: ""
+    token: ""
+    secretName: ""
 
-# Optional: Postgres Database
-# A standalone Postgres database configured to work with Supabase services.
-# You can spin up any other Postgres database container if required.
-# If so, make sure to adjust DB_HOST accordingly to point to the right database service.
 db:
-  # Enable database provisioning
+  fullname: "db"
   enabled: true
   image:
     repository: supabase/postgres
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "17.4.1.027"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
-  fullnameOverride: ""
-  livenessProbe: {}
   readinessProbe: {}
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
-  podAnnotations: {}
-  podSecurityContext: {}
-    # fsGroup: 2000
-  securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
+  livenessProbe:
+    exec:
+      command:
+        - pg_isready
+        - -U
+        - postgres
+    failureThreshold: 10
+    initialDelaySeconds: 60
+    periodSeconds: 15
+    timeoutSeconds: 20
   service:
     type: ClusterIP
     port: 5432
   environment:
-    POSTGRES_HOST: /var/run/postgresql
     PGPORT: "5432"
-    POSTGRES_PORT: "5432"
     JWT_EXP: 3600
-    # POSTGRES_HOST_AUTH_METHOD: md5
-    # Enable SSL for postgres by specifying paths for mounted certificate key pair
-    # POSTGRES_SSL_CERT: /path/to/ssl/server.crt
-    # POSTGRES_SSL_KEY: /path/to/ssl/server.key
-  # volumeMounts:
-  #   - name: volume_name
-  #     mountPath: /path/to/my/secret
-  # volumes:
-  #   - name: volume_name
-  #     secret:
-  #       defaultMode: 733
-  #       secretName: my_secret
-  #       items:
-  #       - key: my_secret.txt
-  #         path: name_of_file_in_container.txt
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
@@ -152,38 +68,297 @@ db:
     #   memory: 128Mi
   persistence:
     enabled: true
-    storageClassName: ""
-    annotations: {}
     size: 8Gi
     accessModes:
       - ReadWriteOnce
+    storageClassName: ""
+    annotations: {}
     class: ""
+  serviceAccount:
+    create: true
+    name: database
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
   autoscaling:
-    enabled: true
+    enabled: false
     minReplicas: 1
-    maxReplicas: 100
+    maxReplicas: 5
     targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
   nodeSelector: {}
   tolerations: []
   affinity: {}
   # Additional migration scripts can be defined here
-  config: {}
+  config:
+    99-jwt.sql: |
+      \set jwt_secret `echo "$JWT_SECRET"`
+      \set jwt_exp `echo "$JWT_EXP"`
 
-# Studio Application
+      ALTER DATABASE postgres SET "app.settings.jwt_secret" TO :jwt_secret;
+      ALTER DATABASE postgres SET "app.settings.jwt_exp" TO :jwt_exp;
+    99-logs.sql: |
+      \set pguser `echo "$POSTGRES_USER"`
+
+      create schema if not exists _analytics;
+      alter schema _analytics owner to :pguser;
+    99-realtime.sql: |
+      \set pguser `echo "$POSTGRES_USER"`
+
+      create schema if not exists _realtime;
+      alter schema _realtime owner to :pguser;
+    99-roles.sql: |
+      -- NOTE: change to your own passwords for production environments
+      \set pgpass `echo "$POSTGRES_PASSWORD"`
+
+      ALTER USER authenticator WITH PASSWORD :'pgpass';
+      ALTER USER pgbouncer WITH PASSWORD :'pgpass';
+      ALTER USER supabase_auth_admin WITH PASSWORD :'pgpass';
+      ALTER USER supabase_functions_admin WITH PASSWORD :'pgpass';
+      ALTER USER supabase_storage_admin WITH PASSWORD :'pgpass';
+    98-webhooks.sql: |
+      BEGIN;
+        -- Create pg_net extension
+        CREATE EXTENSION IF NOT EXISTS pg_net SCHEMA extensions;
+        -- Create supabase_functions schema
+        CREATE SCHEMA supabase_functions AUTHORIZATION supabase_admin;
+        GRANT USAGE ON SCHEMA supabase_functions TO postgres, anon, authenticated, service_role;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA supabase_functions GRANT ALL ON TABLES TO postgres, anon, authenticated, service_role;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA supabase_functions GRANT ALL ON FUNCTIONS TO postgres, anon, authenticated, service_role;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA supabase_functions GRANT ALL ON SEQUENCES TO postgres, anon, authenticated, service_role;
+        -- supabase_functions.migrations definition
+        CREATE TABLE supabase_functions.migrations (
+          version text PRIMARY KEY,
+          inserted_at timestamptz NOT NULL DEFAULT NOW()
+        );
+        -- Initial supabase_functions migration
+        INSERT INTO supabase_functions.migrations (version) VALUES ('initial');
+        -- supabase_functions.hooks definition
+        CREATE TABLE supabase_functions.hooks (
+          id bigserial PRIMARY KEY,
+          hook_table_id integer NOT NULL,
+          hook_name text NOT NULL,
+          created_at timestamptz NOT NULL DEFAULT NOW(),
+          request_id bigint
+        );
+        CREATE INDEX supabase_functions_hooks_request_id_idx ON supabase_functions.hooks USING btree (request_id);
+        CREATE INDEX supabase_functions_hooks_h_table_id_h_name_idx ON supabase_functions.hooks USING btree (hook_table_id, hook_name);
+        COMMENT ON TABLE supabase_functions.hooks IS 'Supabase Functions Hooks: Audit trail for triggered hooks.';
+        CREATE FUNCTION supabase_functions.http_request()
+          RETURNS trigger
+          LANGUAGE plpgsql
+          AS $function$
+          DECLARE
+            request_id bigint;
+            payload jsonb;
+            url text := TG_ARGV[0]::text;
+            method text := TG_ARGV[1]::text;
+            headers jsonb DEFAULT '{}'::jsonb;
+            params jsonb DEFAULT '{}'::jsonb;
+            timeout_ms integer DEFAULT 1000;
+          BEGIN
+            IF url IS NULL OR url = 'null' THEN
+              RAISE EXCEPTION 'url argument is missing';
+            END IF;
+
+            IF method IS NULL OR method = 'null' THEN
+              RAISE EXCEPTION 'method argument is missing';
+            END IF;
+
+            IF TG_ARGV[2] IS NULL OR TG_ARGV[2] = 'null' THEN
+              headers = '{"Content-Type": "application/json"}'::jsonb;
+            ELSE
+              headers = TG_ARGV[2]::jsonb;
+            END IF;
+
+            IF TG_ARGV[3] IS NULL OR TG_ARGV[3] = 'null' THEN
+              params = '{}'::jsonb;
+            ELSE
+              params = TG_ARGV[3]::jsonb;
+            END IF;
+
+            IF TG_ARGV[4] IS NULL OR TG_ARGV[4] = 'null' THEN
+              timeout_ms = 1000;
+            ELSE
+              timeout_ms = TG_ARGV[4]::integer;
+            END IF;
+
+            CASE
+              WHEN method = 'GET' THEN
+                SELECT http_get INTO request_id FROM net.http_get(
+                  url,
+                  params,
+                  headers,
+                  timeout_ms
+                );
+              WHEN method = 'POST' THEN
+                payload = jsonb_build_object(
+                  'old_record', OLD,
+                  'record', NEW,
+                  'type', TG_OP,
+                  'table', TG_TABLE_NAME,
+                  'schema', TG_TABLE_SCHEMA
+                );
+
+                SELECT http_post INTO request_id FROM net.http_post(
+                  url,
+                  payload,
+                  params,
+                  headers,
+                  timeout_ms
+                );
+              ELSE
+                RAISE EXCEPTION 'method argument % is invalid', method;
+            END CASE;
+
+            INSERT INTO supabase_functions.hooks
+              (hook_table_id, hook_name, request_id)
+            VALUES
+              (TG_RELID, TG_NAME, request_id);
+
+            RETURN NEW;
+          END
+        $function$;
+        -- Supabase super admin
+        DO
+        $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1
+            FROM pg_roles
+            WHERE rolname = 'supabase_functions_admin'
+          )
+          THEN
+            CREATE USER supabase_functions_admin NOINHERIT CREATEROLE LOGIN NOREPLICATION;
+          END IF;
+        END
+        $$;
+        GRANT ALL PRIVILEGES ON SCHEMA supabase_functions TO supabase_functions_admin;
+        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA supabase_functions TO supabase_functions_admin;
+        GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA supabase_functions TO supabase_functions_admin;
+        ALTER USER supabase_functions_admin SET search_path = "supabase_functions";
+        ALTER table "supabase_functions".migrations OWNER TO supabase_functions_admin;
+        ALTER table "supabase_functions".hooks OWNER TO supabase_functions_admin;
+        ALTER function "supabase_functions".http_request() OWNER TO supabase_functions_admin;
+        GRANT supabase_functions_admin TO postgres;
+        -- Remove unused supabase_pg_net_admin role
+        DO
+        $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1
+            FROM pg_roles
+            WHERE rolname = 'supabase_pg_net_admin'
+          )
+          THEN
+            REASSIGN OWNED BY supabase_pg_net_admin TO supabase_admin;
+            DROP OWNED BY supabase_pg_net_admin;
+            DROP ROLE supabase_pg_net_admin;
+          END IF;
+        END
+        $$;
+        -- pg_net grants when extension is already enabled
+        DO
+        $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1
+            FROM pg_extension
+            WHERE extname = 'pg_net'
+          )
+          THEN
+            GRANT USAGE ON SCHEMA net TO supabase_functions_admin, postgres, anon, authenticated, service_role;
+            ALTER function net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) SECURITY DEFINER;
+            ALTER function net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) SECURITY DEFINER;
+            ALTER function net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) SET search_path = net;
+            ALTER function net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) SET search_path = net;
+            REVOKE ALL ON FUNCTION net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) FROM PUBLIC;
+            REVOKE ALL ON FUNCTION net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) FROM PUBLIC;
+            GRANT EXECUTE ON FUNCTION net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) TO supabase_functions_admin, postgres, anon, authenticated, service_role;
+            GRANT EXECUTE ON FUNCTION net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) TO supabase_functions_admin, postgres, anon, authenticated, service_role;
+          END IF;
+        END
+        $$;
+        -- Event trigger for pg_net
+        CREATE OR REPLACE FUNCTION extensions.grant_pg_net_access()
+        RETURNS event_trigger
+        LANGUAGE plpgsql
+        AS $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1
+            FROM pg_event_trigger_ddl_commands() AS ev
+            JOIN pg_extension AS ext
+            ON ev.objid = ext.oid
+            WHERE ext.extname = 'pg_net'
+          )
+          THEN
+            GRANT USAGE ON SCHEMA net TO supabase_functions_admin, postgres, anon, authenticated, service_role;
+            ALTER function net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) SECURITY DEFINER;
+            ALTER function net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) SECURITY DEFINER;
+            ALTER function net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) SET search_path = net;
+            ALTER function net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) SET search_path = net;
+            REVOKE ALL ON FUNCTION net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) FROM PUBLIC;
+            REVOKE ALL ON FUNCTION net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) FROM PUBLIC;
+            GRANT EXECUTE ON FUNCTION net.http_get(url text, params jsonb, headers jsonb, timeout_milliseconds integer) TO supabase_functions_admin, postgres, anon, authenticated, service_role;
+            GRANT EXECUTE ON FUNCTION net.http_post(url text, body jsonb, params jsonb, headers jsonb, timeout_milliseconds integer) TO supabase_functions_admin, postgres, anon, authenticated, service_role;
+          END IF;
+        END;
+        $$;
+        COMMENT ON FUNCTION extensions.grant_pg_net_access IS 'Grants access to pg_net';
+        DO
+        $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1
+            FROM pg_event_trigger
+            WHERE evtname = 'issue_pg_net_access'
+          ) THEN
+            CREATE EVENT TRIGGER issue_pg_net_access ON ddl_command_end WHEN TAG IN ('CREATE EXTENSION')
+            EXECUTE PROCEDURE extensions.grant_pg_net_access();
+          END IF;
+        END
+        $$;
+        INSERT INTO supabase_functions.migrations (version) VALUES ('20210809183423_update_grants');
+        ALTER function supabase_functions.http_request() SECURITY DEFINER;
+        ALTER function supabase_functions.http_request() SET search_path = supabase_functions;
+        REVOKE ALL ON FUNCTION supabase_functions.http_request() FROM PUBLIC;
+        GRANT EXECUTE ON FUNCTION supabase_functions.http_request() TO postgres, anon, authenticated, service_role;
+      COMMIT;
+
 studio:
-  # Enable studio provisioning
+  name: "studio"
   enabled: true
+  fullname: "studio"
   image:
     repository: supabase/studio
     pullPolicy: IfNotPresent
     tag: "latest"
-  imagePullSecrets: []
-  replicaCount: 1
-  nameOverride: ""
-  fullnameOverride: ""
-  livenessProbe: {}
-  readinessProbe: {}
+  environment:
+    STUDIO_DEFAULT_ORGANIZATION: "cuemby"
+    STUDIO_DEFAULT_PROJECT: "cuemby-platform"
+    STUDIO_PORT: "3000"
+    SUPABASE_PUBLIC_URL: http://studio.netsaj.sh
+    NEXT_PUBLIC_ENABLE_LOGS: "true"
+    # Set value to bigquery to use Big Query backend for analytics
+    NEXT_ANALYTICS_BACKEND_PROVIDER: postgres  # postgres, bigquery
+  # livenessProbe:
+  #   httpGet:
+  #     path: /api/profile
+  #     port: 3000
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+  service:
+    type: ClusterIP
+    port: 3000
+  serviceAccountName: studio
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
@@ -192,73 +367,42 @@ studio:
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
-  podAnnotations: {}
-  podSecurityContext: {}
-    # fsGroup: 2000
-  securityContext: {}
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
-  service:
-    type: ClusterIP
-    port: 3000
-  environment:
-    STUDIO_DEFAULT_ORGANIZATION: Default Organization
-    STUDIO_DEFAULT_PROJECT: Default Project
-    STUDIO_PORT: "3000"
-    SUPABASE_PUBLIC_URL: http://example.com
-    NEXT_PUBLIC_ENABLE_LOGS: "true"
-    # Set value to bigquery to use Big Query backend for analytics
-    NEXT_ANALYTICS_BACKEND_PROVIDER: postgres  # postgres, bigquery
-  # volumeMounts:
-  #   - name: volume_name
-  #     mountPath: /path/to/my/secret
-  # volumes:
-  #   - name: volume_name
-  #     secret:
-  #       defaultMode: 733
-  #       secretName: my_secret
-  #       items:
-  #       - key: my_secret.txt
-  #         path: name_of_file_in_container.txt
-  resources: {}
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #   cpu: 100m
-    #   memory: 128Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 128Mi
+  ingress:
+    className: nginx
+    host: studio.netsaj.sh
+    annotations:
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
+      external-dns.alpha.kubernetes.io/hostname: studio.netsaj.sh
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+      cert-manager.io/cluster-issuer: "cloudflare-issuer"
+  replicaCount: 1
   autoscaling:
     enabled: true
     minReplicas: 1
-    maxReplicas: 100
+    maxReplicas: 3
     targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
+  resources: {}
 
-# Auth Service
 auth:
-  # Enable auth provisioning
   enabled: true
+  fullname: "auth"
   image:
-    repository: supabase/gotrue
+    repository: supabase/auth
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "v2.172.0"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
-  fullnameOverride: ""
   livenessProbe: {}
+    # enabled: true
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
+    # timeoutSeconds: 5
+    # failureThreshold: 6
+    # successThreshold: 1
   readinessProbe: {}
+  serviceAccountName: core-auth
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
@@ -282,35 +426,74 @@ auth:
     port: 9999
   environment:
     # Override the database hostname if using external database
-    # DB_HOST: DATABASE.NAMESPACE.svc.cluster.local
-    DB_USER: supabase_auth_admin
     DB_PORT: 5432
     DB_DRIVER: postgres
     DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
-    API_EXTERNAL_URL: http://example.com
+
+    API_EXTERNAL_URL: https://selfhosted.netsaj.sh
+
     GOTRUE_API_HOST: "0.0.0.0"
     GOTRUE_API_PORT: "9999"
-    GOTRUE_SITE_URL: http://example.com
+    GOTRUE_SITE_URL: https://studio.netsaj.sh
     GOTRUE_URI_ALLOW_LIST: "*"
     GOTRUE_DISABLE_SIGNUP: "false"
+    GOTRUE_JWT_ADMIN_GROUP_NAME: service_role
     GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
     GOTRUE_JWT_ADMIN_ROLES: service_role
     GOTRUE_JWT_AUD: authenticated
     GOTRUE_JWT_EXP: "3600"
+    # SEND EMAIL
+    #  SMTP
+    GOTRUE_SMTP_HOST: smtp.resend.com
+    GOTRUE_SMTP_PORT: "587"
+    GOTRUE_SMTP_SENDER_NAME: "Cuemby Team"
+    GOTRUE_SMTP_ADMIN_EMAIL: ""
     GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
     GOTRUE_MAILER_AUTOCONFIRM: "true"
-    # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
-    # GOTRUE_SMTP_MAX_FREQUENCY: 1s
-    GOTRUE_SMTP_ADMIN_EMAIL: "SMTP_ADMIN_MAIL"
-    GOTRUE_SMTP_HOST: "SMTP_HOST"
-    GOTRUE_SMTP_PORT: "SMTP_PORT"
-    GOTRUE_SMTP_SENDER_NAME: "SMTP_SENDER_NAME"
-    GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
     GOTRUE_SMS_AUTOCONFIRM: "false"
     GOTRUE_MAILER_URLPATHS_INVITE: "/auth/v1/verify"
     GOTRUE_MAILER_URLPATHS_CONFIRMATION: "/auth/v1/verify"
     GOTRUE_MAILER_URLPATHS_RECOVERY: "/auth/v1/verify"
     GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: "/auth/v1/verify"
+    MAILER_OTP_EXP: "259200"
+    MAILER_SUBJECTS_INVITE: ""
+    MAILER_SUBJECTS_CONFIRMATION: ""
+    MAILER_SUBJECTS_RECOVERY: ""
+    MAILER_SUBJECTS_MAGIC_LINK: ""
+    MAILER_TEMPLATES_INVITE: ""
+    MAILER_SUBJECTS_EMAIL_CHANGE: ""
+    MAILER_TEMPLATES_CONFIRMATION: ""
+    MAILER_TEMPLATES_RECOVERY: ""
+    MAILER_TEMPLATES_MAGIC_LINK: ""
+    MAILER_TEMPLATES_EMAIL_CHANGE: ""
+    # LOGS
+    LOG_LEVEL: debug # available without GOTRUE prefix (exception)
+    GOTRUE_LOG_FILE: /var/log/go/auth.log
+    # GITHUB
+    GOTRUE_EXTERNAL_GITHUB_ENABLED: "true"
+    GOTRUE_EXTERNAL_GITHUB_CLIENT_ID: ""
+    GOTRUE_EXTERNAL_GITHUB_SECRET: ""
+    GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ""
+    # GILAB
+    GOTRUE_EXTERNAL_GITLAB_ENABLED: "true"
+    GOTRUE_EXTERNAL_GITLAB_CLIENT_ID: ""
+    GOTRUE_EXTERNAL_GITLAB_SECRET: ""
+    GOTRUE_EXTERNAL_GITLAB_REDIRECT_URI: ""
+    # GOOGLE
+    GOTRUE_EXTERNAL_GOOGLE_ENABLED: "true"
+    GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ""
+    GOTRUE_EXTERNAL_GOOGLE_SECRET: ""
+    GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ""
+    # MICROSOFT
+    GOTRUE_EXTERNAL_MICROSOFT_ENABLED: "true"
+    GOTRUE_EXTERNAL_MICROSOFT_CLIENT_ID: ""
+    GOTRUE_EXTERNAL_MICROSOFT_SECRET: ""
+    GOTRUE_EXTERNAL_MICROSOFT_TENANT: ""
+    GOTRUE_EXTERNAL_MICROSOFT_REDIRECT_URI: ""
+    # GOTRUE_MAILER_URLPATHS_INVITE: "{{ include "supabase.studio.publicURL" . }}/auth/v1/verify"
+    # GOTRUE_MAILER_URLPATHS_CONFIRMATION: "{{ include "supabase.studio.publicURL" . }}/auth/v1/verify"
+    # GOTRUE_MAILER_URLPATHS_RECOVERY: "{{ include "supabase.studio.publicURL" . }}/auth/v1/verify"
+    # GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: "{{ include "supabase.studio.publicURL" . }}/auth/v1/verify"
   envFrom: []
     # - secretRef:
     #     name: env-secret
@@ -345,10 +528,12 @@ auth:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  extraConfig: {}
 
 # Rest Service
 rest:
   # Enable postgrest provisioning
+  fullname: "rest"
   enabled: true
   image:
     repository: postgrest/postgrest
@@ -356,7 +541,6 @@ rest:
     tag: "latest"
   imagePullSecrets: []
   nameOverride: ""
-  fullnameOverride: ""
   livenessProbe: {}
   readinessProbe: {}
   serviceAccount:
@@ -383,14 +567,15 @@ rest:
   environment:
     # Override the database hostname if using external database
     # DB_HOST: DATABASE.NAMESPACE.svc.cluster.local
+    DB_DRIVER: postgres
     DB_USER: authenticator
     DB_PORT: 5432
-    DB_DRIVER: postgres
     DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
     PGRST_DB_SCHEMAS: public,storage,graphql_public
-    PGRST_DB_ANON_ROLE: anon
+    # PGRST_DB_ANON_ROLE: anon
     PGRST_DB_USE_LEGACY_GUCS: false
     PGRST_APP_SETTINGS_JWT_EXP: 3600
+    PGRST_DB_ANON_ROLE: service_role
   # volumeMounts:
   #   - name: volume_name
   #     mountPath: /path/to/my/secret
@@ -426,6 +611,7 @@ rest:
 # Realtime Service
 realtime:
   # Enable realtime provisioning
+  fullname: "realtime"
   enabled: true
   image:
     repository: supabase/realtime
@@ -433,7 +619,6 @@ realtime:
     tag: "latest"
   imagePullSecrets: []
   nameOverride: ""
-  fullnameOverride: ""
   livenessProbe: {}
   readinessProbe: {}
   serviceAccount:
@@ -460,15 +645,16 @@ realtime:
   environment:
     # Override the database hostname if using external database
     # DB_HOST: DATABASE.NAMESPACE.svc.cluster.local
-    DB_USER: supabase_admin
     DB_PORT: 5432
     DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
-    DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
-    DB_ENC_KEY: supabaserealtime
+    DB_AFTER_CONNECT_QUERY: "SET search_path TO realtime"
+    # DB_ENC_KEY: supabaserealtime
+    APP_NAME: realtime
     PORT: "4000"
+    SLOT_NAME: "realtime"
+    TEMPORARY_SLOT: "true"
     FLY_ALLOC_ID: fly123
     FLY_APP_NAME: realtime
-    SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
     ERL_AFLAGS: -proto_dist inet_tcp
     ENABLE_TAILSCALE: "false"
     DNS_NODES: "''"
@@ -507,11 +693,12 @@ realtime:
 # Meta Service
 meta:
   # Enable meta provisioning
+  fullname: "meta"
   enabled: true
   image:
     repository: supabase/postgres-meta
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "v0.88.9"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -541,8 +728,6 @@ meta:
     port: 8080
   environment:
     # Override the database hostname if using external database
-    # DB_HOST: DATABASE.NAMESPACE.svc.cluster.local
-    DB_USER: supabase_admin
     DB_PORT: 5432
     DB_DRIVER: postgres
     DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
@@ -582,6 +767,7 @@ meta:
 # Storage Service
 storage:
   # Enable storage provisioning
+  fullname: "storage"
   enabled: true
   image:
     repository: supabase/storage-api
@@ -623,11 +809,11 @@ storage:
     DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
     PGOPTIONS: -c search_path=storage,public
     FILE_SIZE_LIMIT: "52428800"
-    STORAGE_BACKEND: file  # file, s3
+    STORAGE_BACKEND: s3  # file, s3
+    GLOBAL_S3_BUCKET: stub
+    REGION: stub
     FILE_STORAGE_BACKEND_PATH: /var/lib/storage
     TENANT_ID: stub
-    REGION: stub
-    GLOBAL_S3_BUCKET: stub
     # Set variables below and secret.s3 above to enable S3 storage bucket
     # If using this chart's minio, skip the endpoint and protocol below
     # GLOBAL_S3_ENDPOINT: http://minio:9000
@@ -677,6 +863,7 @@ storage:
 # imgproxy
 imgproxy:
   # Enable imgproxy provisioning
+  fullname: "imgproxy"
   enabled: true
   image:
     repository: darthsim/imgproxy
@@ -710,10 +897,12 @@ imgproxy:
     type: ClusterIP
     port: 5001
   environment:
+    IMGPROXY_AUTO_WEBP: "true"
+    IMGPROXY_KEY: ""
+    IMGPROXY_SALT: ""
     IMGPROXY_BIND: ":5001"
     IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
     IMGPROXY_USE_ETAG: "true"
-    IMGPROXY_ENABLE_WEBP_DETECTION: "true"
   # volumeMounts:
   #   - name: volume_name
   #     mountPath: /path/to/my/secret
@@ -753,10 +942,11 @@ imgproxy:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  ed: false
 
 # Kong
 kong:
-  # Enable kong provisioning
+  fullname: "kong"
   enabled: true
   image:
     repository: kong
@@ -786,9 +976,15 @@ kong:
     # readOnlyRootFilesystem: true
     # runAsNonRoot: true
     # runAsUser: 1000
+  # serviceAccountName: kong
   service:
     type: ClusterIP
     port: 8000
+    ports:
+      proxyHttp: 8000
+      proxyHttps: 8443
+      adminHttp: 8001
+      adminHttps: 8444
   environment:
     KONG_DATABASE: "off"
     KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
@@ -802,10 +998,15 @@ kong:
     enabled: true
     className: "nginx"
     annotations:
-      nginx.ingress.kubernetes.io/rewrite-target: /
-      # cert-manager.io/cluster-issuer: "letsencrypt-staging"
-      # kubernetes.io/tls-acme: "true"
-    tls: []
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
+      external-dns.alpha.kubernetes.io/hostname:  selfhosted.netsaj.sh
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+      cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    tls:
+      - hosts:
+          - selfhosted.netsaj.sh
+        secretName: selfhosted-netsaj.sh-tls
       # Define TLS secret for SSL termination.
       # This section can be left blank if using cluster certificate manager.
       # Otherwise, setting this in tandem with certificate manager will overwrite the secret name.
@@ -813,7 +1014,7 @@ kong:
       #   hosts:
       #     - example.com
     hosts:
-      - host: example.com
+      - host: selfhosted.netsaj.sh
         paths:
           - path: /
             pathType: Prefix
@@ -852,6 +1053,7 @@ kong:
 # Analytics
 analytics:
   # Enable analytics provisioning
+  fullname: "analytics"
   enabled: true
   image:
     repository: supabase/logflare
@@ -888,13 +1090,15 @@ analytics:
     LOGFLARE_NODE_HOST: 127.0.0.1
     # Override the database hostname if using external database
     # DB_HOST: DATABASE.NAMESPACE.svc.cluster.local
-    DB_USERNAME: supabase_admin
     DB_PORT: 5432
-    DB_DRIVER: postgresql
-    DB_SCHEMA: _analytics
+    DB_DRIVER: postgres
+    DB_SCHEMA: analytics
+    DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
     LOGFLARE_SINGLE_TENANT: "true"
     LOGFLARE_SUPABASE_MODE: "true"
     FEATURE_FLAG_OVERRIDE: multibackend=true
+    SHOW_SENSITIVE_DATA_ON_CONNECTION_ERROR: "true"
+    DB_AFTER_CONNECT_QUERY: "SET search_path TO analytics"
   # Enable Big Query backend for analytics
   bigQuery:
     enabled: false
@@ -936,11 +1140,12 @@ analytics:
 # Vector
 vector:
   # Enable vector provisioning
+  fullname: "vector"
   enabled: true
   image:
     repository: timberio/vector
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "latest-alpine"
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
@@ -1000,28 +1205,23 @@ vector:
   tolerations: []
   affinity: {}
 
-# Functions
 functions:
-  # Enable functions provisioning
   enabled: true
+  fullname: "functions"
+  dockerconfig:
+    registry: ""
+    username: ""
+    password: ""
   image:
     repository: supabase/edge-runtime
     pullPolicy: IfNotPresent
-    tag: "latest"
-  imagePullSecrets: []
+    tag: "v1.67.4"
+  imagePullSecrets:
+    - name: credentials-registry
   replicaCount: 1
   nameOverride: ""
-  fullnameOverride: ""
   livenessProbe: {}
   readinessProbe: {}
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
   podAnnotations: {}
   podSecurityContext: {}
     # fsGroup: 2000
@@ -1035,25 +1235,33 @@ functions:
   service:
     type: ClusterIP
     port: 9000
+  serviceAccount:
+    create: true
+    name: core-functions
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+  initContainers:
+    image:
+      repository: harbor.cuemby.io/cuemby-platform/cp-functions
+      tag: "v2.0.59-dev.9"
   environment:
     # Override the database hostname if using external database
     # DB_HOST: DATABASE.NAMESPACE.svc.cluster.local
-    DB_USERNAME: supabase_functions_admin
-    DB_PORT: 5432
-    DB_DRIVER: postgresql
-    DB_SSL: disable  # disable, allow, prefer, require, verify-ca, verify-full
-  # Mount user functions
-  # volumeMounts:
-  #   - name: my_functions
-  #     mountPath: /home/deno/functions/main/main
-  # volumes:
-  #   - name: my_functions
-  #     secret:
-  #       defaultMode: 733
-  #       secretName: my_secret
-  #       items:
-  #       - key: my_secret.ts
-  #         path: name_of_file_in_container.ts
+    # DB_USERNAME: "supabase_functions_admin"
+    # DB_PORT: 5432
+    # DB_DRIVER: "postgresql"
+    # DB_SSL: "disable"
+    # SUPABASE
+    # DOMAIN
+  volumeMounts:
+    - name: functions-source
+      mountPath: /home/deno/functions
+  volumes:
+    - name: functions-source
+      emptyDir: {}
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
@@ -1065,51 +1273,66 @@ functions:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
-  autoscaling:
-    enabled: true
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
   nodeSelector: {}
   tolerations: []
   affinity: {}
 
-# minio
 minio:
-  enabled: false
+  # fullnameOverride: "minio"
+  fullname: minio
+  enabled: true
   image:
-    repository: minio/minio
+    repository: quay.io/minio/minio
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "RELEASE.2023-11-01T01-57-10Z-cpuv1"
+  labels:
+    app: minio
+  annotations:
+    meta.helm.sh/release-name: minio
+    meta.helm.sh/release-namespace: minio
   imagePullSecrets: []
   replicaCount: 1
   nameOverride: ""
-  fullnameOverride: ""
   livenessProbe: {}
   readinessProbe: {}
+  service:
+    type: ClusterIP
+    port: 9000
   serviceAccount:
-    # Specifies whether a service account should be created
     create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
+    name: minio
+  serviceAccountName: minio
   podAnnotations: {}
   podSecurityContext: {}
     # fsGroup: 2000
   securityContext: {}
+  volumeMounts: {}
+    # - name: storage
+    #   mountPath: /storage
+  volumes: {}
+    # - name: storage
+    #   persistentVolumeClaim:
+    #     claimName: minio-storage-pvc
     # capabilities:
     #   drop:
     #   - ALL
     # readOnlyRootFilesystem: true
     # runAsNonRoot: true
     # runAsUser: 1000
-  service:
-    type: ClusterIP
-    port: 9000
-  environment: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+  persistence:
+    enabled: true
+    size: 10Gi
+    accessModes:
+      - ReadWriteOnce
+    minioClassName: minio
+  environment:
+    MINIO_DEFAULT_BUCKETS: "test"
+    FILE_SIZE_LIMIT: "52428800"
   # Mount user functions
   # volumeMounts:
   #   - name: my_functions
@@ -1123,6 +1346,27 @@ minio:
   #       - key: my_secret.ts
   #         path: name_of_file_in_container.ts
   resources: {}
+  ingress:
+    className: nginx
+    enabled: true
+    annotations:
+      external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
+      external-dns.alpha.kubernetes.io/hostname: minio.netsaj.sh
+      nginx.ingress.kubernetes.io/backend-protocol: HTTP
+      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+      cert-manager.io/cluster-issuer: "cloudflare-issuer"
+
+    tls:
+      - hosts:
+          - minio.netsaj.sh
+        secretName: minio-netsaj.sh-tls
+      # Define TLS secret for SSL termination.
+      # This section can be left blank if using cluster certificate manager.
+      # Otherwise, setting this in tandem with certificate manager will overwrite the secret name.
+      # - secretName: example-com-tls
+      #   hosts:
+      #     - example.com
+    host: minio.netsaj.sh
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -1133,20 +1377,6 @@ minio:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
-  persistence:
-    enabled: false
-    storageClassName: ""
-    annotations: {}
-    size: 10Gi
-    accessModes:
-      - ReadWriteOnce
-    class: ""
-  autoscaling:
-    enabled: true
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
   nodeSelector: {}
   tolerations: []
   affinity: {}
