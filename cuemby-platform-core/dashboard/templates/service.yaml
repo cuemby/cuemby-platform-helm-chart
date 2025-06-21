@@ -3,16 +3,16 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: cuemby-system
-  name: dashboard-service
+  name: cuemby-platform-dashboard
   labels:
-    app.kubernetes.io/name: dashboard-service
-    app.kubernetes.io/part-of: "dashboard-service"
-    app.kubernetes.io/component: "dashboard-service"
+    app.kubernetes.io/name: cuemby-platform-dashboard
+    app.kubernetes.io/part-of: "cuemby-platform-dashboard"
+    app.kubernetes.io/component: "cuemby-platform-dashboard"
 spec:
   selector:
-    app.kubernetes.io/name: dashboard-service
-    app.kubernetes.io/part-of: "dashboard-service"
-    app.kubernetes.io/component: "dashboard-service"
+    app.kubernetes.io/name: cuemby-platform-dashboard
+    app.kubernetes.io/part-of: "cuemby-platform-dashboard"
+    app.kubernetes.io/component: "cuemby-platform-dashboard"
   type: ClusterIP
   ports:
     - name: http

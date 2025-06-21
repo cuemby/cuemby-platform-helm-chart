@@ -11,6 +11,9 @@ dependencies:
 - name: platform
   repository: file://../cuemby-platform-core/platform
   version: 1.0.0
+- name: dashboard
+  repository: file://../cuemby-platform-core/dashboard
+  version: 1.0.0
 - name: harbor
   repository: https://helm.goharbor.io
   version: 1.14.0

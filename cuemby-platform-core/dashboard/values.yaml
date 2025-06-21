@@ -3,14 +3,16 @@ dashboard:
   image:
     repository: harbor.cuemby.io/cuemby-platform/cp-dashboard
     tag: latest
+  imagePullSecrets:
+    - name: credentials-registry
   service:
     type: ClusterIP
     port: 80
   ingress:
-    enabled: false
-    ingressClassName: ngnix
+    enabled: true
+    ingressClassName: nginx
     host: dashboard.netsaj.sh
-    annotations: 
+    annotations:
       external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
       external-dns.alpha.kubernetes.io/hostname: dashboard.netsaj.sh
       nginx.ingress.kubernetes.io/backend-protocol: HTTP
@@ -19,7 +21,7 @@ dashboard:
     tls:
       - hosts:
           - dashboard.netsaj.sh
-        secretName: dashboard-netsaj-sh-tls
+        secretName: dashboard-netsaj.sh-tls
   resources:
     requests:
       cpu: "10m"

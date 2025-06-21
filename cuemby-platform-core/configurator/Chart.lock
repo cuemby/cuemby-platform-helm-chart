@@ -1,6 +1,9 @@
 dependencies:
+- name: keda
+  repository: https://kedacore.github.io/charts
+  version: 2.14.2
 - name: reloader
   repository: https://stakater.github.io/stakater-charts
   version: 1.0.104
-digest: sha256:39ef7aa4c231699de51873fad31d4a19c242130c807a4a0f7f628c70efa2e477
-generated: "2025-06-04T10:57:16.421118-05:00"
+digest: sha256:159259e0342aeab3b502310d520f50e3b279aa67767eead636bb8808bf3c1dbe
+generated: "2025-06-17T09:30:00.630391-05:00"

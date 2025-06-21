@@ -8,6 +8,7 @@ The cuemby platform configurator
 
 | Repository | Name | Version |
 |------------|------|---------|
+| https://kedacore.github.io/charts | keda | 2.14.2 |
 | https://stakater.github.io/stakater-charts | reloader | 1.0.104 |
 
 ## Values
@@ -15,7 +16,7 @@ The cuemby platform configurator
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | configurator.dockerconfig.password | string | `""` |  |
-| configurator.dockerconfig.registry | string | `"harbor.cuemby.io"` |  |
+| configurator.dockerconfig.registry | string | `""` |  |
 | configurator.dockerconfig.username | string | `""` |  |
 | configurator.enabled | bool | `true` |  |
 | configurator.environment.DATABASE_NAME | string | `"postgres"` |  |
@@ -24,7 +25,7 @@ The cuemby platform configurator
 | configurator.environment.PGHOST | string | `"cuemby-platform-core-db"` |  |
 | configurator.environment.PGPASSWORD | string | `""` |  |
 | configurator.environment.PGPORT | string | `"5432"` |  |
-| configurator.environment.PGUSERNAME | string | `"supabase_admin"` |  |
+| configurator.environment.PGUSERNAME | string | `""` |  |
 | configurator.environment.SUPABASE_DB_SERVICE_NAME | string | `"cuemby-platform-core-db"` |  |
 | configurator.environment.SUPABASE_FUNCTIONS_CP_CONFIG_MAP_NAME | string | `"cuemby-platform-core-functions-cp-config"` |  |
 | configurator.environment.SUPABASE_FUNCTION_SERVICE_NAME | string | `"cuemby-platform-core-functions"` |  |

@@ -25,7 +25,7 @@ The platform is a service that provides the core functionalities of the Cuemby P
 | platform.environment.DB_PASSWORD | string | `""` |  |
 | platform.environment.DB_PORT | string | `"5432"` |  |
 | platform.environment.DB_USERNAME | string | `""` |  |
-| platform.environment.HARBOR_BASE_URL | string | `"https://harbor.cuemby.io/api/v2.0"` |  |
+| platform.environment.HARBOR_BASE_URL | string | `""` |  |
 | platform.environment.HARBOR_PASSWORD | string | `""` |  |
 | platform.environment.HARBOR_USERNAME | string | `""` |  |
 | platform.image.pullPolicy | string | `"Always"` |  |
@@ -44,7 +44,7 @@ The platform is a service that provides the core functionalities of the Cuemby P
 | redis.architecture | string | `"standalone"` |  |
 | redis.auth.enabled | bool | `true` |  |
 | redis.auth.password | string | `""` |  |
-| redis.auth.username | string | `""` |  |
+| redis.auth.username | string | `"default"` |  |
 | redis.commonConfiguration | string | `"databases 100"` |  |
 | secret.db.database | string | `""` |  |
 | secret.db.password | string | `""` |  |

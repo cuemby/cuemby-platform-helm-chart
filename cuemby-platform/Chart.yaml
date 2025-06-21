@@ -18,6 +18,9 @@ dependencies:
   - name: platform
     version: 1.0.0
     repository: file://../cuemby-platform-core/platform
+  - name: dashboard
+    version: 1.0.0
+    repository: file://../cuemby-platform-core/dashboard
   - name: harbor
     alias: registry
     version: 1.14.0

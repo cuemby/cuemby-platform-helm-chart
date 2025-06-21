@@ -24,10 +24,11 @@ spec:
     - host: "{{ .Values.dashboard.ingress.host }}"
       http:
         paths:
-          - pathType: ImplementationSpecific
+          - pathType: Prefix
+            path: /
             backend:
               service:
-                name: cuemby-core-supabase-dashboard
+                name: cuemby-platform-dashboard
                 port:
                   number: 80
-{{- end}}
+{{- end }}
