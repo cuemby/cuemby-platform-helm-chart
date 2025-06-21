@@ -2,25 +2,39 @@ apiVersion: v1
 entries:
   configurator:
   - apiVersion: v2
-    created: "2025-06-16T17:59:39.059334-05:00"
+    created: "2025-06-20T14:28:39.027174-05:00"
     dependencies:
+    - name: keda
+      repository: https://kedacore.github.io/charts
+      version: 2.14.2
     - name: reloader
       repository: https://stakater.github.io/stakater-charts
       version: 1.0.104
     description: The cuemby platform configurator
-    digest: 50de9e605921eb85e116e25673c50acc376dfb366fec0cfee73cbd8485a91c74
+    digest: ae5ebd8f361934e565688230771e386d4f33e1f12a3765d39c677c1ea237f8da
     name: configurator
     type: application
     urls:
     - configurator-1.0.0.tgz
     version: 1.0.0
+  core:
+  - apiVersion: v2
+    created: "2025-06-20T14:28:39.02973-05:00"
+    description: The open source Firebase alternative.
+    digest: c99ef1799c2ac35896f6bd5c94444e17e2e4ddf647fd0e56fbb18b1974ef7a8a
+    icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
+    name: core
+    type: application
+    urls:
+    - core-0.1.3.tgz
+    version: 0.1.3
   cuemby-platform:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-06-16T17:59:39.073314-05:00"
+    created: "2025-06-20T14:28:39.04293-05:00"
     dependencies:
-    - name: supabase
-      repository: file://../cuemby-platform-core/supabase
+    - name: core
+      repository: file://../cuemby-platform-core/core
       version: 0.1.3
     - name: walrus
       repository: file://../cuemby-platform-core/walrus
@@ -31,21 +45,35 @@ entries:
     - name: platform
       repository: file://../cuemby-platform-core/platform
       version: 1.0.0
+    - name: dashboard
+      repository: file://../cuemby-platform-core/dashboard
+      version: 1.0.0
     - alias: registry
       condition: registry.enabled
       name: harbor
       repository: https://helm.goharbor.io
       version: 1.14.0
     description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
-    digest: 7e908cda87d18ccde0b5676e184330ceff6c963d78dae77fef898f9bdcd26943
+    digest: 4d442ec8b41b5da58d1bf64cfd30b6e5457608647fb1089fb261be89b6d51839
     name: cuemby-platform
     type: application
     urls:
     - cuemby-platform-1.0.0.tgz
     version: 1.0.0
+  dashboard:
+  - apiVersion: v2
+    created: "2025-06-20T14:28:39.043276-05:00"
+    description: The dashboard for the Cuemby Platform, providing a user interface
+      for managing and monitoring the platform's components.
+    digest: 8c22276f727c0d6a09d5f03ee54f4b521033c8af5ec1f6d084559562c23e979c
+    name: dashboard
+    type: application
+    urls:
+    - dashboard-1.0.0.tgz
+    version: 1.0.0
   platform:
   - apiVersion: v2
-    created: "2025-06-16T17:59:39.080513-05:00"
+    created: "2025-06-20T14:28:39.049055-05:00"
     dependencies:
     - name: rabbitmq
       repository: https://charts.bitnami.com/bitnami
@@ -55,31 +83,20 @@ entries:
       version: 17.11.3
     description: The platform is a service that provides the core functionalities
       of the Cuemby Platform.
-    digest: 9fc6c29beec05df2d50d94870edecd882dcd6b157f057f9788be27149f682f31
+    digest: 38e6356acb04792894c648f9dd4fa6ad4fa8de7c66ff3bb23103904059fb1d50
     name: platform
     type: application
     urls:
     - platform-1.0.0.tgz
     version: 1.0.0
-  supabase:
-  - apiVersion: v2
-    created: "2025-06-16T17:59:39.084262-05:00"
-    description: The open source Firebase alternative.
-    digest: 9919331e61a22f9385a9c2030a25b1db4445a1bb90e4cc1b0200fd314640e67c
-    icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
-    name: supabase
-    type: application
-    urls:
-    - supabase-0.1.3.tgz
-    version: 0.1.3
   walrus:
   - apiVersion: v2
-    created: "2025-06-16T17:59:39.084532-05:00"
+    created: "2025-06-20T14:28:39.049406-05:00"
     description: The walrus
-    digest: d259c0dcaa352488939e706a9b91a9beed8b8875a4023e16d94778d6ab842bfc
+    digest: 886cdacbe4b7eba329be0523a898611e476279132180c5b023910bc9eca593e7
     name: walrus
     type: application
     urls:
     - walrus-1.0.0.tgz
     version: 1.0.0
-generated: "2025-06-16T17:59:39.058274-05:00"
+generated: "2025-06-20T14:28:39.023093-05:00"
