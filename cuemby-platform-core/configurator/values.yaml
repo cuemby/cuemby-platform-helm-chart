@@ -13,7 +13,7 @@ reloader:
 configurator:
   enabled: true
   dockerconfig:
-    registry: "harbor.cuemby.io"
+    registry: ""
     username: ""
     password: ""
   imagePullSecrets:
@@ -23,8 +23,9 @@ configurator:
     pullPolicy: IfNotPresent
     tag: "v2.0.59-dev.7"
   environment:
+    # SupabaseDB
     PGPASSWORD: ""
-    PGUSERNAME: "supabase_admin"
+    PGUSERNAME: ""
     DATABASE_NAME: "postgres"
     PGPORT: "5432"
     PGHOST: "cuemby-platform-core-db"
