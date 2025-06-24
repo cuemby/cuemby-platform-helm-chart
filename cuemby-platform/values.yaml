@@ -1,8 +1,276 @@
-supabase:
-  enabled: true
-
-walrus:
-  enabled: true
-
 configurator:
+  configurator:
+    enabled: true
+    dockerconfig:
+      password: ""
+      registry: ""
+      username: ""
+    environment:
+      GITHUB_CLIENT_ID: ""
+      GITHUB_CLIENT_SECRET: ""
+      PGPASSWORD: ""
+      PGUSERNAME: ""
+  secret:
+    db:
+      database: ""
+      password: ""
+      username: ""
+    github:
+      clientId: ""
+      clientSecret: ""
+
+platform:
   enabled: true
+  global: {}
+  platform:
+    enabled: true
+    dockerconfig:
+      password: ""
+      registry: ""
+      username: ""
+    environment:
+      API_KEY: ""
+      DB_PASSWORD: ""
+      DB_USERNAME: ""
+      HARBOR_BASE_URL: ""
+      HARBOR_PASSWORD: ""
+      HARBOR_USERNAME: ""
+  rabbitmq:
+    auth:
+      enableLoopbackUser: false
+      erlangCookie: ""
+      existingErlangSecret: ""
+      existingPasswordSecret: ""
+      username: ""
+      password: ""
+      securePassword: true
+  redis:
+    architecture: standalone
+    auth:
+      enabled: true
+      username: ""
+      password: ""
+    commonConfiguration: |-
+      databases 100
+  secret:
+    db:
+      database: ""
+      password: ""
+      username: ""
+    github:
+      clientId: ""
+      clientSecret: ""
+
+registry:
+  database:
+    type: external
+    external:
+      coreDatabase: ""
+      existingSecret: ""
+      host: ""
+      password: ""
+      port: 5432
+      sslmode: disable
+      username: ""
+  enabled: true
+  expose:
+    clusterIP:
+      annotations: {}
+      labels: {}
+      name: harbor
+      ports:
+        httpPort: 80
+        httpsPort: 443
+      staticClusterIP: ""
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: ""
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: ""
+        external-dns.alpha.kubernetes.io/hostname: ""
+        ingress.kubernetes.io/proxy-body-size: ""
+        ingress.kubernetes.io/ssl-redirect: ""
+        nginx.ingress.kubernetes.io/backend-protocol: ""
+        nginx.ingress.kubernetes.io/force-ssl-redirect: ""
+        nginx.ingress.kubernetes.io/proxy-body-size: ""
+        nginx.ingress.kubernetes.io/ssl-redirect: ""
+      className: ""
+      controller: default
+      hosts:
+        core: ""
+    type: ingress
+  externalURL: ""
+  harborAdminPassword: ""
+  redis:
+    type: external
+    external:
+      addr: ""
+      password: ""
+      username: ""
+
+core:
+  imgproxy:
+    environment:
+      IMGPROXY_AUTO_WEBP: "true"
+      IMGPROXY_KEY: ""
+      IMGPROXY_SALT: ""
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+  analytics:
+    enabled: true
+    affinity: {}
+    autoscaling:
+      enabled: true
+      maxReplicas: 100
+      minReplicas: 1
+      targetCPUUtilizationPercentage: 80
+  auth:
+    environment:
+      API_EXTERNAL_URL: ""
+      GOTRUE_SITE_URL: ""
+      # SMTP
+      GOTRUE_SMTP_HOST: ""
+      GOTRUE_SMTP_PORT: ""
+      GOTRUE_SMTP_SENDER_NAME: ""
+      GOTRUE_SMTP_ADMIN_EMAIL: ""
+
+      MAILER_OTP_EXP: ""
+      MAILER_SUBJECTS_INVITE: ""
+      MAILER_SUBJECTS_CONFIRMATION: ""
+      MAILER_SUBJECTS_RECOVERY: ""
+      MAILER_SUBJECTS_MAGIC_LINK: ""
+      # MAILER_TEMPLATES_INVITE: ""
+      MAILER_SUBJECTS_EMAIL_CHANGE: ""
+      MAILER_TEMPLATES_CONFIRMATION: ""
+      MAILER_TEMPLATES_RECOVERY: ""
+      MAILER_TEMPLATES_MAGIC_LINK: ""
+      MAILER_TEMPLATES_EMAIL_CHANGE: ""
+      # LOGS
+      LOG_LEVEL: ""
+      GOTRUE_LOG_FILE: ""
+      # GITHUB
+      GOTRUE_EXTERNAL_GITHUB_ENABLED: ""
+      GOTRUE_EXTERNAL_GITHUB_CLIENT_ID: ""
+      GOTRUE_EXTERNAL_GITHUB_SECRET: ""
+      GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ""
+      # GILAB
+      GOTRUE_EXTERNAL_GITLAB_ENABLED: ""
+      GOTRUE_EXTERNAL_GITLAB_CLIENT_ID: ""
+      GOTRUE_EXTERNAL_GITLAB_SECRET: ""
+      GOTRUE_EXTERNAL_GITLAB_REDIRECT_URI: ""
+      # GOOGLE
+      GOTRUE_EXTERNAL_GOOGLE_ENABLED: ""
+      GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ""
+      GOTRUE_EXTERNAL_GOOGLE_SECRET: ""
+      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ""
+      # MICROSOFT
+      GOTRUE_EXTERNAL_MICROSOFT_ENABLED: ""
+      GOTRUE_EXTERNAL_MICROSOFT_CLIENT_ID: ""
+      GOTRUE_EXTERNAL_MICROSOFT_SECRET: ""
+      GOTRUE_EXTERNAL_MICROSOFT_TENANT: ""
+      GOTRUE_EXTERNAL_MICROSOFT_REDIRECT_URI: ""
+  functions:
+    dockerconfig:
+      registry: ""
+      username: ""
+      password: ""
+    environment:
+      CCP_DOMAIN_APP: ""
+      CP_CORE_REGISTRY_DEFAULT_PRODIVER: ""
+      HARBOR_BASE_URL: ""
+      HARBOR_PASSWORD: ""
+      HARBOR_REGISTRY: ""
+      HARBOR_USERNAME: ""
+      INGRESS_ANNOTATIONS: ""
+      INGRESS_CLASSNAME: ""
+      INGRESS_ENABLED: ""
+      INGRESS_TLS_ENABLED: ""
+      LIMIT_STORAGE_HARBOR: ""
+      REDIS_HOSTNAME: ""
+      REDIS_PASSWORD: ""
+      REDIS_PORT: ""
+      REDIS_USERNAME: ""
+      SENTRY_DSN: ""
+      SUPA_URL: ""
+  minio:
+    ingress:
+      className: ""
+      enabled: true
+      annotations:
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: ''
+        external-dns.alpha.kubernetes.io/hostname: ''
+        nginx.ingress.kubernetes.io/backend-protocol: ''
+        nginx.ingress.kubernetes.io/force-ssl-redirect: ''
+        cert-manager.io/cluster-issuer: ""
+    tls:
+      - hosts:
+          - ""
+        secretName: ""
+    host: ""
+  kong:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: ""
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: ""
+        external-dns.alpha.kubernetes.io/hostname: ""
+        nginx.ingress.kubernetes.io/backend-protocol: ""
+        nginx.ingress.kubernetes.io/force-ssl-redirect: ""
+      className: ""
+      hosts:
+      - host: ""
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - hosts:
+        - ""
+        secretName: ""
+  realtime:
+    enabled: true
+    environment:
+      SECRET_KEY_BASE: ""
+  secret:
+    jwt:
+      anonKey: ""
+      serviceKey: ""
+      secret: ""
+    smtp:
+      username: ""
+      password: ""
+    dashboard:
+      username: ""
+      password: ""
+    db:
+      username: ""
+      password: ""
+      database: ""
+    analytics:
+      apiKey: ""
+    s3:
+      keyId: ""
+      accessKey: ""
+      secretKey: ""
+      bucket: ""
+      region: ""
+      endpoint: ""
+      cdnUrl: ""
+    git:
+      repoUrl: ""
+      token: ""
+      secretName: ""
+  studio:
+    environment:
+      NEXT_ANALYTICS_BACKEND_PROVIDER: ""
+      NEXT_PUBLIC_ENABLE_LOGS: ""
+      STUDIO_DEFAULT_ORGANIZATION: ""
+      STUDIO_DEFAULT_PROJECT: ""
+      SUPABASE_PUBLIC_URL: ""
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: ""
+        external-dns.alpha.kubernetes.io/cloudflare-proxied: ""
+        external-dns.alpha.kubernetes.io/hostname: ""
+        nginx.ingress.kubernetes.io/backend-protocol: ""
+        nginx.ingress.kubernetes.io/force-ssl-redirect: ""
+      className: ""
+      host: ""
