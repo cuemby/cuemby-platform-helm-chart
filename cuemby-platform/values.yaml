@@ -1,14 +1,23 @@
 configurator:
   configurator:
+    # Enable or disable the configurator deployment
     enabled: true
+    # Docker registry credentials for pulling images of cuemby-platform configurator
     dockerconfig:
+      # This is the password for accessing the Docker registry.
       password: ""
+      # This is the URL of the Docker registry where the configurator image is stored.
       registry: ""
+      # This is the username for accessing the Docker registry.
       username: ""
     environment:
+      # Github oauth client id and secret
       GITHUB_CLIENT_ID: ""
+      # Github oauth client secret
       GITHUB_CLIENT_SECRET: ""
+      # Database password
       PGPASSWORD: ""
+      # Database username
       PGUSERNAME: ""
   secret:
     db:
@@ -19,37 +28,56 @@ configurator:
       clientId: ""
       clientSecret: ""
 
+# This is the platform module responsible for background tasks in CP
 platform:
+  # Enable or disable the platform module
   enabled: true
-  global: {}
   platform:
     enabled: true
+    # Docker registry credentials for pulling images of cuemby-platform platform
     dockerconfig:
+      # This is the password for accessing the Docker registry.
       password: ""
+      # This is the URL of the Docker registry where the configurator image is stored.
       registry: ""
+      # This is the username for accessing the Docker registry.
       username: ""
     environment:
+      # This is the API key for the service (this is for the authentication layer)
       API_KEY: ""
+      # Database password
       DB_PASSWORD: ""
+      # Database username
       DB_USERNAME: ""
+      # This is the URL of your Docker registry, either Harbor or Docker Hub, that you have configured.
       HARBOR_BASE_URL: ""
+      # This is the password for accessing your Docker registry.
       HARBOR_PASSWORD: ""
+      # This is the username for accessing your Docker registry.
       HARBOR_USERNAME: ""
   rabbitmq:
     auth:
+      # Enable or disable loopback user for RabbitMQ
       enableLoopbackUser: false
+      # This is the erlang cookie for RabbitMQ
       erlangCookie: ""
-      existingErlangSecret: ""
-      existingPasswordSecret: ""
+      # This is the username for the RabbitMQ user.
       username: ""
+      # This is the password for the RabbitMQ user.
       password: ""
+      # Enable or disable RabbitMQ authentication
       securePassword: true
   redis:
+    # Redis deployment architecture (e.g., standalone or cluster)
     architecture: standalone
     auth:
+      # Enable or disable authentication in Redis
       enabled: true
+      # Username for Redis authentication
       username: ""
+      # Password for Redis
       password: ""
+    # Additional Redis configuration, like number of databases
     commonConfiguration: |-
       databases 100
   secret:
@@ -63,140 +91,215 @@ platform:
 
 registry:
   database:
+    # Type of database used by Harbor (e.g., external)
     type: external
     external:
+      # Name of the core database schema used by Harbor
       coreDatabase: ""
+      # Name of an existing Kubernetes secret containing DB credentials
       existingSecret: ""
+      # Hostname or IP of the external PostgreSQL database
       host: ""
+      # Password for the database user
       password: ""
+      # Port number for connecting to the database
       port: 5432
+      # SSL mode used when connecting to the database (e.g., disable, require)
       sslmode: disable
+      # Username for authenticating to the database
       username: ""
+  # Enable or disable the Harbor registry
   enabled: true
   expose:
     clusterIP:
-      annotations: {}
-      labels: {}
+      # Name of the clusterIP service
       name: harbor
       ports:
+        # HTTP port exposed by the clusterIP service
         httpPort: 80
+        # HTTPS port exposed by the clusterIP service
         httpsPort: 443
+      # Static cluster IP address, if manually assigned
       staticClusterIP: ""
     ingress:
       annotations:
+        # Cluster issuer used by cert-manager for TLS certificates
         cert-manager.io/cluster-issuer: ""
+        # Enable or disable Cloudflare proxy for external-dns
         external-dns.alpha.kubernetes.io/cloudflare-proxied: ""
+        # Hostname used by external-dns
         external-dns.alpha.kubernetes.io/hostname: ""
+        # Sets max size of body accepted by the ingress controller
         ingress.kubernetes.io/proxy-body-size: ""
+        # Enables or disables SSL redirect
         ingress.kubernetes.io/ssl-redirect: ""
+        # Backend protocol used by ingress (e.g., HTTP, HTTPS)
         nginx.ingress.kubernetes.io/backend-protocol: ""
+        # Forces SSL redirect in nginx ingress
         nginx.ingress.kubernetes.io/force-ssl-redirect: ""
+        # Sets max body size in nginx ingress
         nginx.ingress.kubernetes.io/proxy-body-size: ""
+        # Enables or disables SSL redirect in nginx ingress
         nginx.ingress.kubernetes.io/ssl-redirect: ""
+      # Class name of the ingress controller
       className: ""
+      # Controller identifier for the ingress
       controller: default
       hosts:
+        # Hostname used to expose the Harbor core service
         core: ""
+    # Exposure type for Harbor (e.g., ingress, clusterIP)
     type: ingress
+  # External URL used to access Harbor
   externalURL: ""
+  # Password for the Harbor admin user
   harborAdminPassword: ""
   redis:
+    # Type of Redis service (e.g., external)
     type: external
     external:
+      # Redis server address
       addr: ""
+      # Redis password
       password: ""
+      # Redis username (if required)
       username: ""
 
+# Core services configuration for cuemby-platform
 core:
+  # Image proxy service configuration
   imgproxy:
     environment:
+      # Automatically enable WebP image format for optimized images
       IMGPROXY_AUTO_WEBP: "true"
+      # Secret key used to sign image URLs for security
       IMGPROXY_KEY: ""
+      # Salt used for secure image URL generation
       IMGPROXY_SALT: ""
+      # Address and port to bind the imgproxy service
       IMGPROXY_BIND: ":5001"
+      # Root path of the local file system accessible by imgproxy
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      # Enable or disable ETag support for caching
       IMGPROXY_USE_ETAG: "true"
+  # Analytics service configuration
   analytics:
+    # Enable or disable the analytics service
     enabled: true
+    # Affinity rules for scheduling analytics pods
     affinity: {}
     autoscaling:
+      # Enable or disable autoscaling for analytics
       enabled: true
+      # Maximum number of replicas for autoscaling
       maxReplicas: 100
+      # Minimum number of replicas for autoscaling
       minReplicas: 1
+      # Target CPU utilization percentage for autoscaling
       targetCPUUtilizationPercentage: 80
+  # Authentication service configuration
   auth:
     environment:
+      # Public API endpoint for authentication
       API_EXTERNAL_URL: ""
+      # Site URL for authentication redirects
       GOTRUE_SITE_URL: ""
-      # SMTP
+      # SMTP configuration for email sending
       GOTRUE_SMTP_HOST: ""
+      # SMTP port for email sending
       GOTRUE_SMTP_PORT: ""
+      # SMTP username for authentication
       GOTRUE_SMTP_SENDER_NAME: ""
+      # SMTP sender email address
       GOTRUE_SMTP_ADMIN_EMAIL: ""
-
-      MAILER_OTP_EXP: ""
+      # Expiration time for OTPs in seconds
+      MAILER_OTP_EXP: "259200"
+      # Email subject for user invitation
       MAILER_SUBJECTS_INVITE: ""
+      # Email subject for user confirmation
       MAILER_SUBJECTS_CONFIRMATION: ""
+      # Email subject for password recovery
       MAILER_SUBJECTS_RECOVERY: ""
+      # Email subject for magic link login
       MAILER_SUBJECTS_MAGIC_LINK: ""
-      # MAILER_TEMPLATES_INVITE: ""
+      # Email subject for email change notifications
       MAILER_SUBJECTS_EMAIL_CHANGE: ""
+      # Email templates for confirmation, recovery, magic link, and email change
       MAILER_TEMPLATES_CONFIRMATION: ""
+      # Template for recovering user accounts
       MAILER_TEMPLATES_RECOVERY: ""
+      # Template for magic link login
       MAILER_TEMPLATES_MAGIC_LINK: ""
+      # Template for email change notifications
       MAILER_TEMPLATES_EMAIL_CHANGE: ""
-      # LOGS
-      LOG_LEVEL: ""
-      GOTRUE_LOG_FILE: ""
-      # GITHUB
+      # Log level (available without GOTRUE prefix)
+      LOG_LEVEL: debug
+      # Log file path for authentication logs
+      GOTRUE_LOG_FILE: /var/log/go/auth.log
+      # GitHub OAuth settings
       GOTRUE_EXTERNAL_GITHUB_ENABLED: ""
       GOTRUE_EXTERNAL_GITHUB_CLIENT_ID: ""
       GOTRUE_EXTERNAL_GITHUB_SECRET: ""
       GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI: ""
-      # GILAB
+      # GitLab OAuth settings
       GOTRUE_EXTERNAL_GITLAB_ENABLED: ""
       GOTRUE_EXTERNAL_GITLAB_CLIENT_ID: ""
       GOTRUE_EXTERNAL_GITLAB_SECRET: ""
       GOTRUE_EXTERNAL_GITLAB_REDIRECT_URI: ""
-      # GOOGLE
+      # Google OAuth settings
       GOTRUE_EXTERNAL_GOOGLE_ENABLED: ""
       GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ""
       GOTRUE_EXTERNAL_GOOGLE_SECRET: ""
       GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ""
-      # MICROSOFT
+      # Microsoft OAuth settings
       GOTRUE_EXTERNAL_MICROSOFT_ENABLED: ""
       GOTRUE_EXTERNAL_MICROSOFT_CLIENT_ID: ""
       GOTRUE_EXTERNAL_MICROSOFT_SECRET: ""
       GOTRUE_EXTERNAL_MICROSOFT_TENANT: ""
       GOTRUE_EXTERNAL_MICROSOFT_REDIRECT_URI: ""
+  # Serverless functions service configuration
   functions:
     dockerconfig:
+      # Docker registry for functions
       registry: ""
+      # Docker registry username
       username: ""
+      # Docker registry password
       password: ""
     environment:
+      # Domain for application access
       CCP_DOMAIN_APP: ""
+      # Default registry provider for core
       CP_CORE_REGISTRY_DEFAULT_PRODIVER: ""
+      # Harbor registry configurations
       HARBOR_BASE_URL: ""
       HARBOR_PASSWORD: ""
       HARBOR_REGISTRY: ""
       HARBOR_USERNAME: ""
+      # Ingress configurations for functions
       INGRESS_ANNOTATIONS: ""
       INGRESS_CLASSNAME: ""
       INGRESS_ENABLED: ""
       INGRESS_TLS_ENABLED: ""
+      # Harbor storage limit for functions
       LIMIT_STORAGE_HARBOR: ""
+      # Redis configurations for functions
       REDIS_HOSTNAME: ""
       REDIS_PASSWORD: ""
       REDIS_PORT: ""
       REDIS_USERNAME: ""
+      # Monitoring and backend integrations
       SENTRY_DSN: ""
       SUPA_URL: ""
+  # MinIO object storage configuration
   minio:
     ingress:
+      # Ingress class name for MinIO
       className: ""
+      # Enable or disable MinIO ingress
       enabled: true
       annotations:
+        # DNS and TLS annotations for MinIO ingress
         external-dns.alpha.kubernetes.io/cloudflare-proxied: ''
         external-dns.alpha.kubernetes.io/hostname: ''
         nginx.ingress.kubernetes.io/backend-protocol: ''
@@ -205,17 +308,23 @@ core:
     tls:
       - hosts:
           - ""
+        # TLS secret name for MinIO
         secretName: ""
+    # MinIO host address
     host: ""
+  # Kong API gateway configuration
   kong:
     ingress:
       annotations:
+        # Annotations for Kong ingress
         cert-manager.io/cluster-issuer: ""
         external-dns.alpha.kubernetes.io/cloudflare-proxied: ""
         external-dns.alpha.kubernetes.io/hostname: ""
         nginx.ingress.kubernetes.io/backend-protocol: ""
         nginx.ingress.kubernetes.io/force-ssl-redirect: ""
+      # Ingress class name for Kong
       className: ""
+      # Ingress host definitions for Kong
       hosts:
       - host: ""
         paths:
@@ -224,29 +333,42 @@ core:
       tls:
       - hosts:
         - ""
+        # TLS secret for Kong ingress
         secretName: ""
+  # Realtime messaging service configuration
   realtime:
+    # Enable or disable the realtime service
     enabled: true
     environment:
+      # Secret used to encrypt communication in realtime service
       SECRET_KEY_BASE: ""
+  # Secret values for platform services
   secret:
     jwt:
+      # Anonymous key for JWT
       anonKey: ""
+      # Service key for JWT
       serviceKey: ""
+      # Secret used to sign JWT
       secret: ""
     smtp:
+      # SMTP credentials for email sending
       username: ""
       password: ""
     dashboard:
+      # Dashboard login credentials
       username: ""
       password: ""
     db:
+      # Database credentials for platform services
       username: ""
       password: ""
       database: ""
     analytics:
+      # API key for analytics service
       apiKey: ""
     s3:
+      # S3 access credentials and config
       keyId: ""
       accessKey: ""
       secretKey: ""
@@ -255,22 +377,31 @@ core:
       endpoint: ""
       cdnUrl: ""
     git:
+      # Git repository settings and credentials
       repoUrl: ""
       token: ""
       secretName: ""
+  # Studio frontend/editor configuration
   studio:
     environment:
+      # Analytics backend provider for Studio
       NEXT_ANALYTICS_BACKEND_PROVIDER: ""
+      # Enable or disable frontend logging in Studio
       NEXT_PUBLIC_ENABLE_LOGS: ""
+      # Default studio organization and project
       STUDIO_DEFAULT_ORGANIZATION: ""
       STUDIO_DEFAULT_PROJECT: ""
+      # Supabase public URL for Studio
       SUPABASE_PUBLIC_URL: ""
     ingress:
       annotations:
+        # Ingress annotations for Studio
         cert-manager.io/cluster-issuer: ""
         external-dns.alpha.kubernetes.io/cloudflare-proxied: ""
         external-dns.alpha.kubernetes.io/hostname: ""
         nginx.ingress.kubernetes.io/backend-protocol: ""
         nginx.ingress.kubernetes.io/force-ssl-redirect: ""
+      # Ingress class name for Studio
       className: ""
+      # Hostname for Studio ingress
       host: ""

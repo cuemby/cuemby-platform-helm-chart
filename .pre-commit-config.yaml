@@ -45,8 +45,10 @@ repos:
   #   hooks:
   #     - id: helmlint
 
-  - repo: https://github.com/norwoodj/helm-docs
-    rev: v1.10.0
-    hooks:
-      - id: helm-docs
-        files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
+  # - repo: https://github.com/norwoodj/helm-docs
+  #   rev: v1.14.2
+  #   hooks:
+  #     - id: helm-docs
+  #       name: Helm Docs
+  #       files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
+  #       require_serial: true
