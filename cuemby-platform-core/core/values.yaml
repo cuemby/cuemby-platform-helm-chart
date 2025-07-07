@@ -1,3 +1,14 @@
+runtimeEngineMode: serverless # Valores posibles: 'service' o 'serverless'
+
+knative:
+  enabled: false # este se autoactivará si runtimeEngineMode == serverless
+  email: knative@cuemby.net
+  wildcardDomain: "*.app-prod.cuemby.io"
+  domain: app-prod.cuemby.io
+  letsencryptDnsKeySecretName: letsencrypt-dns-key
+  cloudflareApiTokenKey: cloudflare_api_token
+  cloudflareApiTokenSecretName: cloudflare-api-token
+  installNamespace: knative-operator
 secret:
   jwt:
     anonKey: ""
