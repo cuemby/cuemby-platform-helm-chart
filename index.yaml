@@ -1,0 +1,102 @@
+apiVersion: v1
+entries:
+  configurator:
+  - apiVersion: v2
+    created: "2025-07-07T19:52:00.041182669Z"
+    dependencies:
+    - name: keda
+      repository: https://kedacore.github.io/charts
+      version: 2.14.2
+    - name: reloader
+      repository: https://stakater.github.io/stakater-charts
+      version: 1.0.104
+    description: The cuemby platform configurator
+    digest: e02b5929ca3cad0b2897008c5e5ee0493369ebe24d1c62b91a618c73e6644999
+    name: configurator
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/configurator-1.0.0.tgz
+    version: 1.0.0
+  core:
+  - apiVersion: v2
+    created: "2025-07-07T19:52:00.045452382Z"
+    description: The open source Firebase alternative.
+    digest: a9766ea87ee6f273c5ad687fb9e864d512ae3a060bfd874bd822d0e459cfbb19
+    icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
+    name: core
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/core-0.1.3.tgz
+    version: 0.1.3
+  cuemby-platform:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-07-07T19:52:00.067694679Z"
+    dependencies:
+    - name: core
+      repository: file://../cuemby-platform-core/core
+      version: 0.1.3
+    - name: walrus
+      repository: file://../cuemby-platform-core/walrus
+      version: 1.0.0
+    - name: configurator
+      repository: file://../cuemby-platform-core/configurator
+      version: 1.0.0
+    - name: platform
+      repository: file://../cuemby-platform-core/platform
+      version: 1.0.0
+    - name: dashboard
+      repository: file://../cuemby-platform-core/dashboard
+      version: 1.0.0
+    - alias: registry
+      condition: registry.enabled
+      name: harbor
+      repository: https://helm.goharbor.io
+      version: 1.14.0
+    description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
+    digest: 15c9d70fe7005a89c5227f5d5f6bf31908fe876cd237c90113e1e23bbaea9e56
+    name: cuemby-platform
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/cuemby-platform-1.0.0.tgz
+    version: 1.0.0
+  dashboard:
+  - apiVersion: v2
+    created: "2025-07-07T19:52:00.067927026Z"
+    description: The dashboard for the Cuemby Platform, providing a user interface
+      for managing and monitoring the platform's components.
+    digest: b45b3d30cdb368d0b4af4a0f12745264fd101b17124092de51035aeb9c6d7269
+    name: dashboard
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/dashboard-1.0.0.tgz
+    version: 1.0.0
+  platform:
+  - apiVersion: v2
+    created: "2025-07-07T19:52:00.076324074Z"
+    dependencies:
+    - name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.0.0
+    - name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.11.3
+    description: The platform is a service that provides the core functionalities
+      of the Cuemby Platform.
+    digest: 1dbf7265be5359c409f323b5f87306ee9b27afec41dfa070973c92d54523c9fc
+    name: platform
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/platform-1.0.0.tgz
+    version: 1.0.0
+  walrus:
+  - apiVersion: v2
+    created: "2025-07-07T19:52:00.076628097Z"
+    description: The walrus
+    digest: bdd8e9030882e35ee437db26e1b9812e4dc0d29543e202348ec152caa752403c
+    name: walrus
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/walrus-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-07-07T19:52:00.034803353Z"
