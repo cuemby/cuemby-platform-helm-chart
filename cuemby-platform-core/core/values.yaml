@@ -369,13 +369,8 @@ studio:
     name: ""
   ingress:
     className: nginx
-    host: studio.netsaj.sh
-    annotations:
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
-      external-dns.alpha.kubernetes.io/hostname: studio.netsaj.sh
-      nginx.ingress.kubernetes.io/backend-protocol: HTTP
-      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
-      cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    host: ""
+    annotations: {}
   replicaCount: 1
   autoscaling:
     enabled: true
@@ -997,27 +992,19 @@ kong:
   ingress:
     enabled: true
     className: "nginx"
-    annotations:
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
-      external-dns.alpha.kubernetes.io/hostname:  selfhosted.netsaj.sh
-      nginx.ingress.kubernetes.io/backend-protocol: HTTP
-      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
-      cert-manager.io/cluster-issuer: "cloudflare-issuer"
-    tls:
-      - hosts:
-          - selfhosted.netsaj.sh
-        secretName: selfhosted-netsaj.sh-tls
+    annotations: {}
+    tls: []
       # Define TLS secret for SSL termination.
       # This section can be left blank if using cluster certificate manager.
       # Otherwise, setting this in tandem with certificate manager will overwrite the secret name.
-      # - secretName: example-com-tls
-      #   hosts:
-      #     - example.com
-    hosts:
-      - host: selfhosted.netsaj.sh
-        paths:
-          - path: /
-            pathType: Prefix
+      # - hosts:
+      #     - selfhosted.{domain}
+      #   secretName: selfhosted-{domain}-tls
+    hosts: []
+      # - host: selfhosted.{domain}
+      #   paths:
+      #     - path: /
+      #       pathType: Prefix
   # volumeMounts:
   #   - name: volume_name
   #     mountPath: /path/to/my/secret
@@ -1329,7 +1316,6 @@ minio:
     size: 10Gi
     accessModes:
       - ReadWriteOnce
-    minioClassName: minio
   environment:
     MINIO_DEFAULT_BUCKETS: "test"
     FILE_SIZE_LIMIT: "52428800"
@@ -1349,24 +1335,15 @@ minio:
   ingress:
     className: nginx
     enabled: true
-    annotations:
-      external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
-      external-dns.alpha.kubernetes.io/hostname: minio.netsaj.sh
-      nginx.ingress.kubernetes.io/backend-protocol: HTTP
-      nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
-      cert-manager.io/cluster-issuer: "cloudflare-issuer"
-
-    tls:
-      - hosts:
-          - minio.netsaj.sh
-        secretName: minio-netsaj.sh-tls
+    annotations: {}
+    tls: []
       # Define TLS secret for SSL termination.
       # This section can be left blank if using cluster certificate manager.
       # Otherwise, setting this in tandem with certificate manager will overwrite the secret name.
-      # - secretName: example-com-tls
-      #   hosts:
-      #     - example.com
-    host: minio.netsaj.sh
+      # - hosts:
+      #     - minio.{domain}
+      #   secretName: minio-{domain}-tls
+    host: ""
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following

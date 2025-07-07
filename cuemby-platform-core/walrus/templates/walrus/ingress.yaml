@@ -16,7 +16,7 @@ spec:
   tls:
   - hosts:
     - {{ .Values.walrus.ingress.hosts.core }}
-    secretName: walrus.netsaj.sh-tls
+    secretName: {{ .Values.walrus.ingress.secretName | default (printf "%s-tls" .Values.walrus.ingress.hosts.core) }}
   rules:
     - host: {{ .Values.walrus.ingress.hosts.core }}
       http:

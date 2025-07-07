@@ -4,15 +4,16 @@ walrus:
     DATABASE_SERVICE_HOST: "cuemby-platform-core-db.cuemby-system.svc.cluster.local"
   ingress:
     hosts:
-      core: walrus.netsaj.sh
+      core: ""
     className: nginx
-    annotations:
-  annotations:
-    external-dns.alpha.kubernetes.io/cloudflare-proxied: 'true'
-    external-dns.alpha.kubernetes.io/hostname: walrus.netsaj.sh
-    nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
-    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    secretName: ""
+    annotations: {}
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 500Mi
+    accessModes:
+      - ReadWriteOnce
 
 iam:
   enabled: true

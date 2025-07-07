@@ -9,7 +9,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: "{{ .Values.dashboard.ingress.ingressClassName }}"
+  ingressClassName: "{{ .Values.dashboard.ingress.className }}"
   {{- if .Values.dashboard.ingress.tls }}
   tls:
     {{- range .Values.dashboard.ingress.tls }}
