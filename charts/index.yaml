@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   configurator:
   - apiVersion: v2
-    created: "2025-06-20T14:28:39.027174-05:00"
+    created: "2025-07-07T14:37:51.822688-05:00"
     dependencies:
     - name: keda
       repository: https://kedacore.github.io/charts
@@ -11,7 +11,7 @@ entries:
       repository: https://stakater.github.io/stakater-charts
       version: 1.0.104
     description: The cuemby platform configurator
-    digest: ae5ebd8f361934e565688230771e386d4f33e1f12a3765d39c677c1ea237f8da
+    digest: 1dc72887201d59fb9f65a9bf7e6388f3c4625a482627ac0565489e091c5578ab
     name: configurator
     type: application
     urls:
@@ -19,9 +19,9 @@ entries:
     version: 1.0.0
   core:
   - apiVersion: v2
-    created: "2025-06-20T14:28:39.02973-05:00"
+    created: "2025-07-07T14:37:51.825485-05:00"
     description: The open source Firebase alternative.
-    digest: c99ef1799c2ac35896f6bd5c94444e17e2e4ddf647fd0e56fbb18b1974ef7a8a
+    digest: 24b55c94621ec33ba7e8ab1b7b1ab014149821fca6d89c317ffa36fd22b1d178
     icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
     name: core
     type: application
@@ -31,7 +31,7 @@ entries:
   cuemby-platform:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2025-06-20T14:28:39.04293-05:00"
+    created: "2025-07-07T14:37:51.840467-05:00"
     dependencies:
     - name: core
       repository: file://../cuemby-platform-core/core
@@ -54,7 +54,7 @@ entries:
       repository: https://helm.goharbor.io
       version: 1.14.0
     description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
-    digest: 4d442ec8b41b5da58d1bf64cfd30b6e5457608647fb1089fb261be89b6d51839
+    digest: 79678477a267c12b7b894f7eca945cc8b2c4c66a474ccc1dff841714276d98b9
     name: cuemby-platform
     type: application
     urls:
@@ -62,10 +62,10 @@ entries:
     version: 1.0.0
   dashboard:
   - apiVersion: v2
-    created: "2025-06-20T14:28:39.043276-05:00"
+    created: "2025-07-07T14:37:51.841016-05:00"
     description: The dashboard for the Cuemby Platform, providing a user interface
       for managing and monitoring the platform's components.
-    digest: 8c22276f727c0d6a09d5f03ee54f4b521033c8af5ec1f6d084559562c23e979c
+    digest: bb52fdd55d3adfe6d14bc8a2a67de900e938081e62c0054b0d0bf051b788610c
     name: dashboard
     type: application
     urls:
@@ -73,7 +73,7 @@ entries:
     version: 1.0.0
   platform:
   - apiVersion: v2
-    created: "2025-06-20T14:28:39.049055-05:00"
+    created: "2025-07-07T14:37:51.847029-05:00"
     dependencies:
     - name: rabbitmq
       repository: https://charts.bitnami.com/bitnami
@@ -83,7 +83,7 @@ entries:
       version: 17.11.3
     description: The platform is a service that provides the core functionalities
       of the Cuemby Platform.
-    digest: 38e6356acb04792894c648f9dd4fa6ad4fa8de7c66ff3bb23103904059fb1d50
+    digest: 384d63dc7eb99b961ff5ba9c6ca24f5b26a8d03ee548172d6a93134104e7f96c
     name: platform
     type: application
     urls:
@@ -91,12 +91,12 @@ entries:
     version: 1.0.0
   walrus:
   - apiVersion: v2
-    created: "2025-06-20T14:28:39.049406-05:00"
+    created: "2025-07-07T14:37:51.847588-05:00"
     description: The walrus
-    digest: 886cdacbe4b7eba329be0523a898611e476279132180c5b023910bc9eca593e7
+    digest: 9f5e554fb54a45c9723fa55a6baba695b397a2caf744605bbda931041293dcf7
     name: walrus
     type: application
     urls:
     - walrus-1.0.0.tgz
     version: 1.0.0
-generated: "2025-06-20T14:28:39.023093-05:00"
+generated: "2025-07-07T14:37:51.818426-05:00"

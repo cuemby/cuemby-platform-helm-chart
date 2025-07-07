@@ -14,6 +14,9 @@ spec:
   {{- if .Values.minio.persistence.minioClassName }}
   minioClassName: {{ .Values.minio.persistence.minioClassName }}
   {{- end }}
+  {{- if .Values.minio.persistence.storageClass }}
+  storageClassName: {{ .Values.minio.persistence.storageClass | quote }}
+  {{- end }}
   accessModes:
   {{- range .Values.minio.persistence.accessModes }}
     - {{ . | quote }}
