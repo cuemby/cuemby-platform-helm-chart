@@ -31,7 +31,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: minio
+              name: {{ include "supabase.minio.fullname" . }}
               port:
-                number: 80
+                number: 9001
 {{- end }}
