@@ -3,9 +3,6 @@ secret:
     username: ""
     password: ""
     database: ""
-  github:
-    clientId: ""
-    clientSecret: ""
 
 rabbitmq:
   auth:
@@ -45,16 +42,15 @@ platform:
     pullPolicy: Always
     tag: "v1.0.33-dev.23"
   environment:
+    API_KEY: ""
     DB_USERNAME: ""
     DB_PASSWORD: ""
-    DB_DATABASE: "postgres"
     DB_HOST: "cuemby-platform-core-db"
     DB_PORT: "5432"
-    API_KEY: ""
+    DB_DATABASE: "postgres"
     HARBOR_BASE_URL: ""
     HARBOR_USERNAME: ""
     HARBOR_PASSWORD: ""
-    # REDIS_ADDR: "redis.sp.cuemby.io:6379"
-    # REDIS_USERNAME: "default"
-    # REDIS_PASSWORD: ""
-    # REDIS_WEBHOOK_DB: "15"
+    MINIO_ACCESS_KEY_ID: ""
+    MINIO_SECRET_ACCESS_KEY: ""
+    MINIO_ENDPOINT: ""

@@ -50,23 +50,58 @@ spec:
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
           command: ["/app/bin/deletionworker"]
           env:
-            {{- range $key, $value := .Values.platform.environment }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
+            - name: API_KEY
+              value: {{ .Values.platform.environment.API_KEY | quote }}
             - name: RABBIT_URI
               value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
-              # value: "{{ .Values.platform.environment.POSTGRES_URI }}"
+            - name: HARBOR_BASE_URL
+              value: {{ .Values.platform.environment.HARBOR_BASE_URL | quote }}
+            - name: HARBOR_USERNAME
+              value: {{ .Values.platform.environment.HARBOR_USERNAME | quote }}
+            - name: HARBOR_PASSWORD
+              value: {{ .Values.platform.environment.HARBOR_PASSWORD | quote }}
             - name: WALRUS_USERNAME
               value: "admin"
             - name: WALRUS_BASE_URL
-              value: "https://walrus:80"
+              value: "http://walru.walrus-system:80"
             - name: WALRUS_API_KEY
               value: ""
             - name: QUEUE_NAME_DELETION_WORKER
               value: "deletion_worker"
+        - name: billingcron
+          ports:
+            - containerPort: 9085
+          image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/billingcron"]
+          env:
+            - name: POSTGRES_URI
+              value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+            - name: DKRON_URL_ADDR
+              value: "http://cuemby-platform-dkron:8080"
+            - name: CP_PLATFORM_V2_URL
+              value: "https://platform-prod.cuemby.io/v1"
+            - name: API_KEY
+              value: {{ .Values.platform.environment.API_KEY | quote }}
+            - name: METRICS_URL
+              value: "http://platform-service:9082"
+        - name: events
+          ports:
+            - containerPort: 9083
+          image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
+          command: ["/app/bin/events"]
+          env:
+            - name: POSTGRES_URI
+              value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+            - name: DAILY_REPORT_ENVIRONMENT
+              value: prod
+            - name: TEAMS_WEBHOOK_REPORT_BASE_URL
+              value: https://prod-14.westus.logic.azure.com:443
+            - name: TEAMS_WEBHOOK_WEEKLY_REPORT_BASE_URL
+              value: https://prod-147.westus.logic.azure.com:443
         - name: metrics
           ports:
             - containerPort: 9082
@@ -74,10 +109,8 @@ spec:
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
           command: ["/app/bin/metrics"]
           env:
-            - name: API_KEY
-              value: ""
             - name: VICTORIA_METRICS_API_URL
-              value: "http://vm:8428"
+              value: "http://vmsingle-victoria-metrics-single:8429"
         - name: logsvc
           ports:
             - containerPort: 9084
@@ -85,10 +118,8 @@ spec:
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
           command: ["/app/bin/logsvc"]
           env:
-            - name: API_KEY
-              value: ""
             - name: VICTORIA_LOGS_API_URL
-              value: "http://vm:8428"
+              value: "http://cuemby-platform-victoria-logs-single-server:9428"
         - name: pauseworker
           ports:
             - containerPort: 9086
@@ -96,14 +127,18 @@ spec:
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
           command: ["/app/bin/pauseworker"]
           env:
-            {{- range $key, $value := .Values.platform.environment }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
+            - name: API_KEY
+              value: {{ .Values.platform.environment.API_KEY | quote }}
             - name: RABBIT_URI
               value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+            - name: WALRUS_USERNAME
+              value: "admin"
+            - name: WALRUS_BASE_URL
+              value: "http://walru.walrus-system:80"
+            - name: WALRUS_API_KEY
+              value: ""
         - name: webhooks
           ports:
             - containerPort: 9085
@@ -111,20 +146,10 @@ spec:
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
           command: ["/app/bin/webhooks"]
           env:
-            - name: API_KEY
-              value: ""
             - name: RABBIT_URI
               value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
-            - name: REDIS_ADDR
-              value: "http://cuemby-platform-redis:6379"
-            - name: REDIS_USERNAME
-              value: "default"
-            - name: REDIS_PASSWORD
-              value: {{ .Values.redis.auth.password | quote }}
-            - name: REDIS_WEBHOOK_DB
-              value: "55"
         - name: api
           ports:
             - containerPort: 9080
@@ -133,21 +158,25 @@ spec:
           command: ["/app/bin/api"]
           env:
             - name: API_KEY
-              value: ""
+              value: {{ .Values.platform.environment.API_KEY | quote }}
             - name: RABBIT_URI
               value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
             - name: MINIO_ACCESS_KEY_ID
-              value: ""
+              value: {{ .Values.platform.environment.MINIO_ACCESS_KEY_ID | quote }}
             - name: MINIO_SECRET_ACCESS_KEY
-              value: ""
+              value: {{ .Values.platform.environment.MINIO_SECRET_ACCESS_KEY | quote }}
             - name: MINIO_ENDPOINT
-              value: ""
+              value: {{ .Values.platform.environment.MINIO_ENDPOINT | quote }}
+            - name: MINIO_REPORT_BUG_BUCKET
+              value: reports-bug
             - name: LOGS_URL
-              value: "http://platform:9084"
+              value: "http://platform-service:9084"
             - name: METRICS_URL
-              value: "http://platform:9082"
+              value: "http://platform-service:9082"
             - name: WEBHOOKS_URL
-              value: "http://platform:9085"
+              value: "http://platform-service:9085"
+            - name: QUEUE_NAME_DELETION_WORKER
+              value: "deletion_worker"
 {{- end }}
