@@ -41,3 +41,49 @@ Create the name of the service account to use
 {{- default "default" .Values.functions.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Generate SECRET_KEY_ENCRYPT_ECB
+*/}}
+{{- define "supabase.functions.secretKeyEncryptECB" -}}
+{{- $secretName := printf "%s-encryption-keys" (include "supabase.functions.fullname" .) -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName -}}
+{{- if $secret -}}
+{{- $secret.data.SECRET_KEY_ENCRYPT_ECB -}}
+{{- else -}}
+{{- randAlphaNum 32 | b64enc -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Generate SECRET_KEY_ENCRYPT_CBC
+*/}}
+{{- define "supabase.functions.secretKeyEncryptCBC" -}}
+{{- $secretName := printf "%s-encryption-keys" (include "supabase.functions.fullname" .) -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName -}}
+{{- if $secret -}}
+{{- $secret.data.SECRET_KEY_ENCRYPT_CBC -}}
+{{- else -}}
+{{- randAlphaNum 32 | b64enc -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Generate SECURE_REPOS_INTERNAL_KEY
+*/}}
+{{- define "supabase.functions.secureReposInternalKey" -}}
+{{- $secretName := printf "%s-encryption-keys" (include "supabase.functions.fullname" .) -}}
+{{- $secret := lookup "v1" "Secret" .Release.Namespace $secretName -}}
+{{- if $secret -}}
+{{- $secret.data.SECURE_REPOS_INTERNAL_KEY -}}
+{{- else -}}
+{{- randAlphaNum 64 | b64enc -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Functions encryption secret name
+*/}}
+{{- define "supabase.functions.encryptionSecretName" -}}
+{{- printf "%s-encryption-keys" (include "supabase.functions.fullname" .) -}}
+{{- end }}

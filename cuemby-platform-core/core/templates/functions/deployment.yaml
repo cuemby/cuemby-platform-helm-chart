@@ -122,6 +122,23 @@ spec:
                   name: {{ include "supabase.secret.jwt" . }}
                   key: serviceKey
                   {{- end }}
+            - name: SECRET_KEY_ENCRYPT_ECB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "supabase.functions.encryptionSecretName" . }}
+                  key: SECRET_KEY_ENCRYPT_ECB
+            - name: SECRET_KEY_ENCRYPT_CBC
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "supabase.functions.encryptionSecretName" . }}
+                  key: SECRET_KEY_ENCRYPT_CBC
+            - name: SECURE_REPOS_INTERNAL_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "supabase.functions.encryptionSecretName" . }}
+                  key: SECURE_REPOS_INTERNAL_KEY
+            - name: LIMIT_STORAGE_HARBOR
+              value: "3221225472"
             - name: DEFAULT_CONNECTOR_NAME
               value: cp-connector
             - name: DEFAULT_CONNECTOR_TYPE
@@ -131,7 +148,7 @@ spec:
             - name: CCP_WALRUS_TEMPLATE_NAME_NO_CONTAINER
               value: "cuemby-labs/walrus-tofu-deploy-source-code-no-container"
             - name: VERSION_TEMPLATE_RESOURCE_CODE_CONTAINER
-              value: "v0.0.9"
+              value: "v2.0.3"
             - name: VERSION_TEMPLATE_RESOURCE_CODE_NO_CONTAINER
               value: "v1.0.3"
             - name: REDIS_TEMPLATE_DB
