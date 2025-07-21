@@ -1,4 +1,4 @@
-{{- if .Values.configurator.enabled -}}
+{{- if .Values.jobs.registryDB.enabled -}}
 apiVersion: batch/v1
 kind: Job
 metadata:

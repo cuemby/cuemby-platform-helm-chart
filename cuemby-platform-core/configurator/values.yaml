@@ -3,12 +3,19 @@ secret:
     username: ""
     password: ""
     database: ""
-  github:
-    clientId: ""
-    clientSecret: ""
+
+keda:
+  enabled: false
 
 reloader:
+  enabled: true
   fullnameOverride: reloader
+
+jobs:
+  walrusDB:
+    enabled: true
+  registryDB:
+    enabled: true
 
 configurator:
   enabled: true
