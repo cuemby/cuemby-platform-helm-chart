@@ -20,5 +20,8 @@ dependencies:
 - name: harbor
   repository: https://helm.goharbor.io
   version: 1.14.0
-digest: sha256:9b0bc9c44581963f55608e2945ce5e7c4711df664d60dff2c2a97cfcffa7070e
-generated: "2025-06-19T16:07:35.800481-05:00"
+- name: dkron
+  repository: https://raw.githubusercontent.com/distribworks/dkron-helm/master
+  version: 2.0.3
+digest: sha256:33242a7fe7604d58abcccf344c13a24747217c4544b99d53fc1b873ce608bfbb
+generated: "2025-07-22T18:30:06.559964-05:00"

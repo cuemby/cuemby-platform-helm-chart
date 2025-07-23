@@ -31,18 +31,18 @@ fluent-bit:
   config:
     outputs: |
       [OUTPUT]
-        Name http
-        Match *
-        Host cuemby-platform-victoria-logs-single-server
-        Port 9428
-        URI /insert/jsonline?_stream_fields=stream&_msg_field=log&_time_field=date
-        Format json_lines
-        Json_date_key @timestamp
-        Json_date_format iso8601
-        Header AccountID 0
-        Header ProjectID 0
-        Compress gzip
-        Workers 2
+          Name http
+          Match *
+          Host cuemby-platform-victoria-logs-server
+          Port 9428
+          URI /insert/jsonline?_stream_fields=stream&_msg_field=log&_time_field=date
+          Format json_lines
+          Json_date_key @timestamp
+          Json_date_format iso8601
+          Header AccountID 0
+          Header ProjectID 0
+          Compress gzip
+          Workers 2
 
 # # Victoria Logs (High-performance log storage)
 victoria-logs:

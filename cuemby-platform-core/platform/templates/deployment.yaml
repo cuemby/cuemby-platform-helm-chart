@@ -150,6 +150,14 @@ spec:
               value: "amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@cuemby-platform-rabbitmq:5672"
             - name: POSTGRES_URI
               value: "postgresql://{{ .Values.platform.environment.DB_USERNAME }}:{{ .Values.platform.environment.DB_PASSWORD }}@{{ .Values.platform.environment.DB_HOST }}:{{ .Values.platform.environment.DB_PORT }}/{{ .Values.platform.environment.DB_DATABASE }}"
+            - name: REDIS_ADDR
+              value: http://cuemby-platform-redis-headless:6379
+            - name: REDIS_USERNAME
+              value: {{ .Values.redis.auth.username | quote }}
+            - name: REDIS_PASSWORD
+              value: {{ .Values.redis.auth.password | quote }}
+            - name: REDIS_WEBHOOK_DB
+              value: '55'
         - name: api
           ports:
             - containerPort: 9080

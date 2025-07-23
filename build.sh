@@ -6,6 +6,10 @@ REPO_URL="${REPO_URL:-}"
 
 echo "🚀 Preparing Helm..."
 
+# Clean helm cache to avoid repository conflicts
+echo "🧹 Cleaning helm cache..."
+rm -rf ~/.cache/helm/repository/helm-manager-* || true
+
 # Delete previous packages
 echo "🧹 Deleting old .tgz files..."
 mkdir -p "$CHARTS_DIR"
@@ -21,7 +25,7 @@ package_chart() {
   fi
 }
 
-# Packaging individual charts (core and registry)
+# Packaging individual charts (core)
 for dir in cuemby-platform-core/* ; do
   package_chart "$dir"
 done

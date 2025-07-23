@@ -1232,8 +1232,8 @@ functions:
     targetCPUUtilizationPercentage: 80
   initContainers:
     image:
-      repository: harbor.cuemby.io/cuemby-platform/cp-functions
-      tag: "v2.0.59-dev.9"
+      repository: harbor-prod.cuemby.io/cuemby-platform/cp-functions
+      tag: "v2.0.60"
   environment:
     # Override the database hostname if using external database
     # DB_HOST: DATABASE.NAMESPACE.svc.cluster.local

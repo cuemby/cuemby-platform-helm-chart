@@ -38,7 +38,7 @@ platform:
   imagePullSecrets:
     - name: credentials-registry
   image:
-    repository: harbor.cuemby.io/cuemby-platform/cp-platform
+    repository: harbor-prod.cuemby.io/cuemby-platform/cp-platform
     pullPolicy: Always
     tag: "v1.0.34-dev"
   environment:
