@@ -1,0 +1,10 @@
+pilot:
+  autoscaleMin: 1
+  autoscaleMax: 5
+
+global:
+  proxy:
+    autoInject: enabled
+
+service:
+  type: ClusterIP
