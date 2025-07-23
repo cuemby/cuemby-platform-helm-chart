@@ -1,0 +1,12 @@
+dependencies:
+- name: victoria-metrics-single
+  repository: https://victoriametrics.github.io/helm-charts
+  version: 0.9.15
+- name: fluent-bit
+  repository: https://fluent.github.io/helm-charts
+  version: 0.48.9
+- name: victoria-logs-single
+  repository: https://victoriametrics.github.io/helm-charts
+  version: 0.8.14
+digest: sha256:8d5499adc622891a9c8c13ddbe86849a74ed3249dd0b54ef41f30b1a423a865f
+generated: "2025-07-22T18:49:59.477839-05:00"
