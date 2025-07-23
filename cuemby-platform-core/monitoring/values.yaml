@@ -1,0 +1,71 @@
+# Victoria Metrics (High-performance metrics storage)
+victoria-metrics:
+  enabled: true
+  vmsingle:
+    enabled: true
+    # name: victoria-metrics
+    spec:
+      retentionPeriod: "90d"
+      replicaCount: 1
+      storage:
+        storageClassName: "standard"
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 10Gi
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 750Mi
+        requests:
+          cpu: 500m
+          memory: 500Mi
+
+# # Fluent Bit (Log collection and forwarding)
+fluent-bit:
+  fullnameOverride: fluent-bit
+  nameOverride: fluent-bit
+  serviceAccount:
+    name: fluent-bit
+  # Configuration
+  config:
+    outputs: |
+      [OUTPUT]
+        Name http
+        Match *
+        Host cuemby-platform-victoria-logs-single-server
+        Port 9428
+        URI /insert/jsonline?_stream_fields=stream&_msg_field=log&_time_field=date
+        Format json_lines
+        Json_date_key @timestamp
+        Json_date_format iso8601
+        Header AccountID 0
+        Header ProjectID 0
+        Compress gzip
+        Workers 2
+
+# # Victoria Logs (High-performance log storage)
+victoria-logs:
+  enabled: true
+  # Victoria Logs Single configuration
+  server:
+    enabled: true
+    image:
+      tag: v0.15.0-victorialogs
+    resources:
+      limits:
+        memory: 150Mi
+      requests:
+        cpu: 25m
+        memory: 100Mi
+  vector:
+    env:
+      - name: VECTOR_SELF_NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+    customConfig:
+      api:
+        enabled: false
+        address: 127.0.0.1:8686
+        playground: true

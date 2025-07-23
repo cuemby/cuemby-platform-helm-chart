@@ -1,0 +1,21 @@
+apiVersion: v2
+name: monitoring
+description: Meta chart that installs all the monitoring components of cuemby-platform
+type: application
+version: 2.0.0
+appVersion: "2.0.0"
+
+dependencies:
+  - name: victoria-metrics-single
+    alias: victoria-metrics
+    version: 0.9.15
+    repository: https://victoriametrics.github.io/helm-charts
+    condition: victoria-metrics.enabled
+  - name: fluent-bit
+    version: 0.48.9
+    repository: https://fluent.github.io/helm-charts
+  - name: victoria-logs-single
+    alias: victoria-logs
+    version: 0.8.14
+    repository: https://victoriametrics.github.io/helm-charts
+    condition: victoria-logs.enabled

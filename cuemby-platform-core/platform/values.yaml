@@ -40,7 +40,7 @@ platform:
   image:
     repository: harbor.cuemby.io/cuemby-platform/cp-platform
     pullPolicy: Always
-    tag: "v1.0.33-dev.23"
+    tag: "v1.0.34-dev"
   environment:
     API_KEY: ""
     DB_USERNAME: ""
