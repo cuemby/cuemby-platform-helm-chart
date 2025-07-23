@@ -1,15 +1,3 @@
-runtimeEngineMode: serverless # posible values: 'service' o 'serverless'
-
-knative:
-  enabled: true # este se autoactivará si runtimeEngineMode == serverless
-  email: ""
-  wildcardDomain: ""
-  domain: ""
-  letsencryptEmail: ""
-  letsencryptDnsKeySecretName: letsencrypt-dns-key
-  cloudflareApiTokenKey: cloudflare_api_token
-  cloudflareApiTokenSecretName: cloudflare-api-token
-  installNamespace: knative-operator
 secret:
   jwt:
     anonKey: ""
