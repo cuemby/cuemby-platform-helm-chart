@@ -2,8 +2,8 @@ apiVersion: v2
 name: cuemby-platform
 description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
 type: application
-version: 1.0.0
-appVersion: "1.0.0"
+version: 2.0.0
+appVersion: "2.0.0"
 
 dependencies:
   - name: core
@@ -31,3 +31,7 @@ dependencies:
     version: 1.14.0
     repository: https://helm.goharbor.io
     condition: registry.enabled
+  - name: dkron
+    version: 2.0.3
+    repository: https://raw.githubusercontent.com/distribworks/dkron-helm/master
+    condition: dkron.enabled

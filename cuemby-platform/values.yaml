@@ -273,16 +273,14 @@ core:
       CP_CORE_REGISTRY_DEFAULT_PRODIVER: ""
       # Harbor registry configurations
       HARBOR_BASE_URL: ""
+      HARBOR_USERNAME: ""
       HARBOR_PASSWORD: ""
       HARBOR_REGISTRY: ""
-      HARBOR_USERNAME: ""
       # Ingress configurations for functions
-      INGRESS_ANNOTATIONS: ""
-      INGRESS_CLASSNAME: ""
-      INGRESS_ENABLED: ""
-      INGRESS_TLS_ENABLED: ""
-      # Harbor storage limit for functions
-      LIMIT_STORAGE_HARBOR: ""
+      # INGRESS_ANNOTATIONS: ""
+      # INGRESS_CLASSNAME: ""
+      # INGRESS_ENABLED: ""
+      # INGRESS_TLS_ENABLED: ""
       # Redis configurations for functions
       REDIS_HOSTNAME: ""
       REDIS_PASSWORD: ""
@@ -290,7 +288,7 @@ core:
       REDIS_USERNAME: ""
       # Monitoring and backend integrations
       SENTRY_DSN: ""
-      SUPA_URL: ""
+      SUPA_URL: "https://api-kong.com"
   # MinIO object storage configuration
   minio:
     ingress:
@@ -405,3 +403,33 @@ core:
       className: ""
       # Hostname for Studio ingress
       host: ""
+
+# Monitoring configuration for cuemby-platform
+monitoring:
+  # Enable or disable monitoring services for the entire platform
+  # When enabled, deploys Victoria Metrics and Victoria Logs for observability
+  enabled: true
+
+  # Victoria Metrics configuration - Time series database for metrics collection
+  victoria-metrics:
+    # Single-node Victoria Metrics deployment configuration
+    vmsingle:
+      # Enable or disable the Victoria Metrics single-node deployment
+      # Single-node is suitable for small to medium workloads
+      enabled: true
+      spec:
+        storage:
+          # Storage class name for persistent volume used by Victoria Metrics
+          # Consider using a distributed storage class for production environments
+          storageClassName: ""
+
+  # Victoria Logs configuration - Log aggregation and search system
+  victoria-logs:
+    server:
+      persistentVolume:
+        # Enable persistent storage for Victoria Logs server
+        # Required to retain logs across pod restarts
+        enabled: true
+        # Storage class name for log persistence
+        # Should match your cluster's available storage classes
+        storageClassName: ""
