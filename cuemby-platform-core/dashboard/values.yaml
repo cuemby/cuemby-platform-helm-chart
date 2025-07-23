@@ -1,7 +1,7 @@
 dashboard:
   enabled: true
   image:
-    repository: harbor.cuemby.io/cuemby-platform/cp-dashboard
+    repository: harbor-prod.cuemby.io/cuemby-platform/cp-dashboard
     tag: latest
   imagePullSecrets:
     - name: credentials-registry

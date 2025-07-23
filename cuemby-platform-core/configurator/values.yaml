@@ -26,9 +26,9 @@ configurator:
   imagePullSecrets:
     - name: credentials-registry
   image:
-    repository: harbor.cuemby.io/cuemby-platform/cp-configurator
+    repository: harbor-prod.cuemby.io/cuemby-platform/cp-configurator
     pullPolicy: IfNotPresent
-    tag: "v2.0.59-dev.7"
+    tag: "v2.0.60"
   environment:
     # SupabaseDB
     PGPASSWORD: ""
