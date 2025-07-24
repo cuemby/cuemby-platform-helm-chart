@@ -1,0 +1,137 @@
+apiVersion: v1
+entries:
+  configurator:
+  - apiVersion: v2
+    created: "2025-07-24T14:11:54.279230971Z"
+    dependencies:
+    - condition: keda.enabled
+      name: keda
+      repository: https://kedacore.github.io/charts
+      version: 2.14.2
+    - name: reloader
+      repository: https://stakater.github.io/stakater-charts
+      version: 1.0.104
+    description: The cuemby platform configurator
+    digest: 2fbe24a7ad84d56b71853f9f2a376341d50eeb80e859486d18db5b6732c45c4a
+    name: configurator
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/configurator-1.0.0.tgz
+    version: 1.0.0
+  core:
+  - apiVersion: v2
+    created: "2025-07-24T14:11:54.282803748Z"
+    description: The open source Firebase alternative.
+    digest: e6e553191a5218b31a2ccbe1414841633b365d5c5e2d00a35084b4714efc4b2a
+    icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
+    name: core
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/core-0.1.3.tgz
+    version: 0.1.3
+  cuemby-platform:
+  - apiVersion: v2
+    appVersion: 2.0.2
+    created: "2025-07-24T14:11:54.315927183Z"
+    dependencies:
+    - name: core
+      repository: file://../cuemby-platform-core/core
+      version: 0.1.3
+    - name: walrus
+      repository: file://../cuemby-platform-core/walrus
+      version: 1.0.0
+    - name: configurator
+      repository: file://../cuemby-platform-core/configurator
+      version: 1.0.0
+    - name: platform
+      repository: file://../cuemby-platform-core/platform
+      version: 1.0.0
+    - name: dashboard
+      repository: file://../cuemby-platform-core/dashboard
+      version: 1.0.0
+    - alias: monitoring
+      condition: monitoring.enabled
+      name: monitoring
+      repository: file://../cuemby-platform-core/monitoring
+      version: 2.0.0
+    - alias: registry
+      condition: registry.enabled
+      name: harbor
+      repository: https://helm.goharbor.io
+      version: 1.14.0
+    - condition: dkron.enabled
+      name: dkron
+      repository: https://raw.githubusercontent.com/distribworks/dkron-helm/master
+      version: 2.0.3
+    description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
+    digest: 908c0c9241a1429278b5d4a1e855f0d2c54d902afe78f3bd7fc158c39fa87336
+    name: cuemby-platform
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/cuemby-platform-2.0.2.tgz
+    version: 2.0.2
+  dashboard:
+  - apiVersion: v2
+    created: "2025-07-24T14:11:54.316216003Z"
+    description: The dashboard for the Cuemby Platform, providing a user interface
+      for managing and monitoring the platform's components.
+    digest: ac9bff301a15cd324a17c11eaea5a105800b1f57e0bd75970e2a9c5f388cb7c7
+    name: dashboard
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/dashboard-1.0.0.tgz
+    version: 1.0.0
+  monitoring:
+  - apiVersion: v2
+    appVersion: 2.0.0
+    created: "2025-07-24T14:11:54.323022259Z"
+    dependencies:
+    - alias: victoria-metrics
+      condition: victoria-metrics.enabled
+      name: victoria-metrics-single
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.9.15
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.48.9
+    - alias: victoria-logs
+      condition: victoria-logs.enabled
+      name: victoria-logs-single
+      repository: https://victoriametrics.github.io/helm-charts
+      version: 0.8.14
+    description: Meta chart that installs all the monitoring components of cuemby-platform
+    digest: 88ab8bcb4af2bfc97eded622db8493054e10655cf00c193eacb51832bbf91512
+    name: monitoring
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/monitoring-2.0.0.tgz
+    version: 2.0.0
+  platform:
+  - apiVersion: v2
+    created: "2025-07-24T14:11:54.333490498Z"
+    dependencies:
+    - name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.0.11
+    - name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 21.2.13
+    description: The platform is a service that provides the core functionalities
+      of the Cuemby Platform.
+    digest: 51c2cae3d122c6c7c1cdac869d94663f0afd49afe8cb853ea059eb292c4a1e5e
+    name: platform
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/platform-1.0.0.tgz
+    version: 1.0.0
+  walrus:
+  - apiVersion: v2
+    created: "2025-07-24T14:11:54.333819633Z"
+    description: The walrus
+    digest: ca7d52f9e1916a7db0b3ced9ea28ec40346d273af9d3f6c44eb09373af4de02b
+    name: walrus
+    type: application
+    urls:
+    - https://cuemby.github.io/cuemby-platform-helm-chart/walrus-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-07-24T14:11:54.27359384Z"
