@@ -6,8 +6,8 @@ metadata:
 data:
   environment.json: |
     {
-      "API_URL": "",
-      "SUPA_ANON": "",
-      "STRIPE_PUB": {{ .Values.stripe.publicKey | quote }},
+      "API_URL": {{ .Values.dashboard.environment.API_URL | quote }},
+      "SUPA_ANON": {{ .Values.dashboard.environment.SUPA_ANON | quote }},
+      "STRIPE_PUB": {{ .Values.dashboard.stripe.publicKey | quote }},
     }
 {{- end }}

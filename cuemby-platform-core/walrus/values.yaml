@@ -1,3 +1,13 @@
+secret:
+  db:
+    driver: "postgres"
+    user: "supabase_admin"
+    password: ""
+    name: "walrus"
+  minio:
+    rootUser: ""
+    rootPassword: ""
+
 walrus:
   enabled: true
   environment:
