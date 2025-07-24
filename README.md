@@ -8,11 +8,27 @@ A Helm chart that installs cuemby-platform and its dependencies.
 
 The platform installation is done in two steps:
 
-### 1. Install dependencies with the script
+### 1. Add repo to helm
+
+```bash
+> helm repo add cuemby https://cuemby.github.io/cuemby-platform-helm-chart/
+> helm repo update
+```
+
+Then you will see the repo in your list.
+
+```bash
+> helm repo list
+
+NAME                	URL
+cuemby              	https://cuemby.github.io/cuemby-platform-helm-chart/
+```
+
+### 2. Install dependencies with the script
 
 This step installs Istio, Knative, and Prometheus with their custom configurations.
 ```bash
-./install-dependencies.sh
+> ./install-dependencies.sh
 ```
 
 The script:
@@ -36,10 +52,11 @@ domain:
 
 Replace it with the domain that corresponds to your environment.
 
-### 2. Install the platform with Helm
+### 3. Install the platform with Helm
 
 Once the dependencies are installed, you can install the platform:
 
 ```sh
-helm install cuemby-platform -f values.yaml . -n cuemby-system --create-namespace
+> helm install cuemby-platform cuemby/cuemby-platform --version <chart_version> --values values.yaml
+> helm install cuemby-platform cuemby/cuemby-platform --version 2.0.1 --values values.yaml
 ```

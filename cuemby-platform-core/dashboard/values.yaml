@@ -26,3 +26,6 @@ dashboard:
       memory: "128Mi"
   stripe:
     publicKey: ""
+  environment:
+    API_URL: "https://dashboard.example.com"
+    SUPA_ANON: ""
