@@ -23,5 +23,8 @@ dependencies:
 - name: dkron
   repository: https://raw.githubusercontent.com/distribworks/dkron-helm/master
   version: 2.0.3
-digest: sha256:33242a7fe7604d58abcccf344c13a24747217c4544b99d53fc1b873ce608bfbb
-generated: "2025-07-22T18:30:06.559964-05:00"
+- name: api-gateway
+  repository: file://../cuemby-platform-core/api-gateway
+  version: 1.0.0
+digest: sha256:76b266666e1369c35545b5803305653377333ce605e4080804fedae07f3dd3ba
+generated: "2025-07-24T22:48:51.269793-05:00"
