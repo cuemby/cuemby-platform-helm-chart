@@ -433,3 +433,23 @@ monitoring:
         # Storage class name for log persistence
         # Should match your cluster's available storage classes
         storageClassName: ""
+
+apiGateway:
+  # Enable or disable the configurator deployment
+  enabled: true
+  environment:
+    BACKEND_HOST: ""
+  ingress:
+        hosts:
+          core: ""
+        className: ""
+        secretName: ""
+        annotations:
+          cert-manager.io/issuer: ""
+          cert-manager.io/issuer-kind: ""
+          cert-manager.io/issuer-group: ""
+          external-dns.alpha.kubernetes.io/hostname: ""
+          nginx.ingress.kubernetes.io/backend-protocol: ""
+          nginx.ingress.kubernetes.io/force-ssl-redirect: ""
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: ""
+  

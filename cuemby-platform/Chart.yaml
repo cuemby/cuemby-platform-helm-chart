@@ -35,3 +35,8 @@ dependencies:
     version: 2.0.3
     repository: https://raw.githubusercontent.com/distribworks/dkron-helm/master
     condition: dkron.enabled
+  - name: api-gateway
+    alias: apiGateway
+    version: 1.0.0
+    repository: file://../cuemby-platform-core/api-gateway
+    condition: apiGateway.enabled

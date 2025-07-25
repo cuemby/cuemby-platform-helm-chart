@@ -1,8 +1,19 @@
 apiVersion: v1
 entries:
+  api-gateway:
+  - apiVersion: v2
+    created: "2025-07-24T22:42:40.780178-05:00"
+    description: The API Gateway is a service that provides the API to functionalities
+      of the CLI.
+    digest: a9e52957baf8726e5fa3a47f64a2f4d4d558643749d49971afd519b04cb38df8
+    name: api-gateway
+    type: application
+    urls:
+    - api-gateway-1.0.0.tgz
+    version: 1.0.0
   configurator:
   - apiVersion: v2
-    created: "2025-07-23T19:47:28.455358-05:00"
+    created: "2025-07-24T22:42:40.784613-05:00"
     dependencies:
     - condition: keda.enabled
       name: keda
@@ -12,7 +23,7 @@ entries:
       repository: https://stakater.github.io/stakater-charts
       version: 1.0.104
     description: The cuemby platform configurator
-    digest: 5bd9096a13da75d721cbc3cae73734d51a9c731bd710356d350ef80dbeb0fccb
+    digest: 8a1215353ef6d3288b30fd5640b56121f9e6ac23f44a792cbf7218a65161f1c5
     name: configurator
     type: application
     urls:
@@ -20,9 +31,9 @@ entries:
     version: 1.0.0
   core:
   - apiVersion: v2
-    created: "2025-07-23T19:47:28.45757-05:00"
+    created: "2025-07-24T22:42:40.786955-05:00"
     description: The open source Firebase alternative.
-    digest: a5894324dee6b1020d595910dfec471798de9700f7b9842c92648632d234f019
+    digest: b817d8542466f401d654878ade59306089ef4a93a750163b6d6d7c91557b6ed7
     icon: https://avatars.githubusercontent.com/u/54469796?s=280&v=4
     name: core
     type: application
@@ -31,8 +42,8 @@ entries:
     version: 0.1.3
   cuemby-platform:
   - apiVersion: v2
-    appVersion: 2.0.1
-    created: "2025-07-23T19:47:28.47696-05:00"
+    appVersion: 2.0.2
+    created: "2025-07-24T22:42:40.806954-05:00"
     dependencies:
     - name: core
       repository: file://../cuemby-platform-core/core
@@ -63,19 +74,24 @@ entries:
       name: dkron
       repository: https://raw.githubusercontent.com/distribworks/dkron-helm/master
       version: 2.0.3
+    - alias: api-gateway
+      condition: apiGateway.enabled
+      name: api-gateway
+      repository: file://../cuemby-platform-core/api-gateway
+      version: 1.0.0
     description: Meta chart que instala todos los componentes obligatorios de cuemby-platform-core
-    digest: 21c9a559d8db6186ff2ca94629ea26ff28bd52d1649bfa7045e1e46f35bd5bc2
+    digest: 21715d91bec5a79ee7c00d0f622aecfb151636c5f168716036216088ea4dd6c5
     name: cuemby-platform
     type: application
     urls:
-    - cuemby-platform-2.0.1.tgz
-    version: 2.0.1
+    - cuemby-platform-2.0.2.tgz
+    version: 2.0.2
   dashboard:
   - apiVersion: v2
-    created: "2025-07-23T19:47:28.477323-05:00"
+    created: "2025-07-24T22:42:40.807308-05:00"
     description: The dashboard for the Cuemby Platform, providing a user interface
       for managing and monitoring the platform's components.
-    digest: 565d6b1d8995a05637e287fbca05141eefdaf7eee7bf445664e5083231618884
+    digest: fae64a4ff8d9739cdb16a55da1e9289f77ab74d777cb112eac8a196e79161a42
     name: dashboard
     type: application
     urls:
@@ -84,7 +100,7 @@ entries:
   monitoring:
   - apiVersion: v2
     appVersion: 2.0.0
-    created: "2025-07-23T19:47:28.481963-05:00"
+    created: "2025-07-24T22:42:40.811871-05:00"
     dependencies:
     - alias: victoria-metrics
       condition: victoria-metrics.enabled
@@ -100,7 +116,7 @@ entries:
       repository: https://victoriametrics.github.io/helm-charts
       version: 0.8.14
     description: Meta chart that installs all the monitoring components of cuemby-platform
-    digest: c980e5b95f8b23fc2ac69f5fb138cc2001a4c046fdf3f9b406b3a5809bb0841d
+    digest: ad0f28b9f1e201eed157066511968356e4b288f763a28dc1529088a59ffc5de2
     name: monitoring
     type: application
     urls:
@@ -108,7 +124,7 @@ entries:
     version: 2.0.0
   platform:
   - apiVersion: v2
-    created: "2025-07-23T19:47:28.489261-05:00"
+    created: "2025-07-24T22:42:40.819219-05:00"
     dependencies:
     - name: rabbitmq
       repository: https://charts.bitnami.com/bitnami
@@ -118,7 +134,7 @@ entries:
       version: 21.2.13
     description: The platform is a service that provides the core functionalities
       of the Cuemby Platform.
-    digest: 8cc2bb94c5144ef65f59070547bac3915c150cb6e7a41eba889fdf44bd279016
+    digest: 2dc4e4ab62a723e7bf46e7e8cd4de8b09206763c2d04a5d5408e5b9082288440
     name: platform
     type: application
     urls:
@@ -126,12 +142,12 @@ entries:
     version: 1.0.0
   walrus:
   - apiVersion: v2
-    created: "2025-07-23T19:47:28.489635-05:00"
+    created: "2025-07-24T22:42:40.819606-05:00"
     description: The walrus
-    digest: 98fcb6be1cdeaf3025117d0f69b64e7ccdac0e8613f618e346867aba0ddb0f8a
+    digest: 358eccc56c13adefb9daeb7713d43fe533a7dfc7e3c311c9c7bbb16ff40fea6e
     name: walrus
     type: application
     urls:
     - walrus-1.0.0.tgz
     version: 1.0.0
-generated: "2025-07-23T19:47:28.45092-05:00"
+generated: "2025-07-24T22:42:40.779767-05:00"

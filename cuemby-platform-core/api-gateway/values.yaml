@@ -1,0 +1,24 @@
+apiGateway:
+  name: "apiGateway"
+  enabled: true
+  dockerconfig:
+    registry: ""
+    username: ""
+    password: ""
+  service:
+    type: NodePort
+    port: 8080
+  imagePullSecrets:
+    - name: credentials-registry
+  image:
+    repository: harbor-prod.cuemby.io/cuemby-platform/cp-api-gateway
+    pullPolicy: Always
+    tag: "v0.0.1-dev.7"
+  environment:
+    BACKEND_HOST: "http://cuemby-platform-core-kong:8000"
+  ingress:
+    hosts:
+      core: ""
+    className: nginx
+    secretName: ""
+    annotations: {}

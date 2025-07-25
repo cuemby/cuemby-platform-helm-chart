@@ -1,0 +1,23 @@
+{{- if .Values.apiGateway.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: cuemby-system
+  name: api-gateway-service
+  labels:
+    app.kubernetes.io/name: api-gateway-service
+    app.kubernetes.io/part-of: "api-gateway-service"
+    app.kubernetes.io/component: "api-gateway-service"
+spec:
+  selector:
+    app.kubernetes.io/name: api-gateway-service
+    app.kubernetes.io/part-of: "api-gateway-service"
+    app.kubernetes.io/component: "api-gateway-service"
+  sessionAffinity: ClientIP
+  type: {{ .Values.apiGateway.service.type }}
+  ports:
+    - name: api-gateway-port-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+{{- end }}
