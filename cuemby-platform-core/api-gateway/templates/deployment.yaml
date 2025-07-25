@@ -1,0 +1,54 @@
+{{- if .Values.apiGateway.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cuemby-system
+  name: api-gateway
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/component: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api-gateway-service
+      app.kubernetes.io/part-of: "api-gateway-service"
+      app.kubernetes.io/component: "api-gateway-service"
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: api-gateway-service
+        app.kubernetes.io/part-of: "api-gateway-service"
+        app.kubernetes.io/component: "api-gateway-service"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                    - key: "app.kubernetes.io/component"
+                      operator: In
+                      values:
+                        - "api-gateway"
+                    - key: "app.kubernetes.io/name"
+                      operator: In
+                      values:
+                        - "api-gateway"
+      restartPolicy: Always
+      {{- with .Values.apiGateway.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: api-gateway
+          ports:
+            - containerPort: 8080
+          image: "{{ .Values.apiGateway.image.repository }}:{{ .Values.apiGateway.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.apiGateway.image.pullPolicy }}
+          env:
+            - name: BACKEND_HOST
+              value: {{ .Values.apiGateway.environment.BACKEND_HOST | quote }}
+{{- end }}

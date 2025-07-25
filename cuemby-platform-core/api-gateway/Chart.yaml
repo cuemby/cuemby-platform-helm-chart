@@ -1,0 +1,5 @@
+apiVersion: v2
+name: api-gateway
+description: The API Gateway is a service that provides the API to functionalities of the CLI.
+type: application
+version: 1.0.0

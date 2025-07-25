@@ -1,0 +1,28 @@
+{{- if .Values.apiGateway.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: cuemby-system
+  name: api-gateway
+  {{- with .Values.apiGateway.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.apiGateway.ingress.className }}
+  tls:
+  - hosts:
+    - {{ .Values.apiGateway.ingress.hosts.core }}
+    secretName: {{ .Values.apiGateway.ingress.secretName | default (printf "%s-tls" .Values.apiGateway.ingress.hosts.core) }}
+  rules:
+    - host: {{ .Values.apiGateway.ingress.hosts.core }}
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: api-gateway
+              port:
+                number: 8080
+{{- end }}
