@@ -122,8 +122,8 @@ install_microk8s() {
     print_status "Esperando a que MicroK8s esté completamente operativo..."
     microk8s status --wait-ready
 
-    print_status "Habilitando complementos básicos (dns, storage, ingress, helm3)..."
-    microk8s enable dns storage ingress helm3
+    print_status "Habilitando complementos básicos (dns, storage, helm3)..."
+    microk8s enable dns storage helm3
 
     # ========================
     # Enable MetalLB with automatic network detection
@@ -398,8 +398,8 @@ EOF
     print_status "Instalando NGINX Ingress Controller…"
     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
     helm repo update
-    microk8s kubectl create namespace $INGRESS_NS || true
-    helm install ingress-nginx ingress-nginx/ingress-nginx --version 4.12.2 -n $INGRESS_NS
+    microk8s kubectl get ns "ingress-nginx" >/dev/null 2>&1 || microk8s kubectl create ns "ingress-nginx"
+    helm install ingress-nginx ingress-nginx/ingress-nginx --version 4.12.2 -n ingress-nginx
 
     # Instal database Metrics Admin
     helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
