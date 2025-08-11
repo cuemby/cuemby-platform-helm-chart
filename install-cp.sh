@@ -64,12 +64,12 @@ STORAGE_DOMAIN=""
 WALRUS_DOMAIN=""
 
 # ===== Vars Nginx Controller =====
-local CF_API_TOKEN=""
-local ORIGIN_CA_KEY=""
-local EXT_DNS_NS="external-dns"
-local ORIGIN_CA_NS="origin-ca"
-local CLUSTER_ISSUER_NAME="origin-ca-issuer"
-local INGRESS_NS="ingress-nginx"
+CF_API_TOKEN=""
+ORIGIN_CA_KEY=""
+EXT_DNS_NS="external-dns"
+ORIGIN_CA_NS="origin-ca"
+CLUSTER_ISSUER_NAME="origin-ca-issuer"
+INGRESS_NS="ingress-nginx"
 
 
 
