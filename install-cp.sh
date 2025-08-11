@@ -398,8 +398,8 @@ EOF
     print_status "Instalando NGINX Ingress Controller…"
     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
     helm repo update
-    microk8s kubectl get ns "ingress-nginx" >/dev/null 2>&1 || microk8s kubectl create ns "ingress-nginx"
-    helm install ingress-nginx ingress-nginx/ingress-nginx --version 4.12.2 -n ingress-nginx
+    microk8s kubectl get ns "$INGRESS_NS" >/dev/null 2>&1 || microk8s kubectl create ns "$INGRESS_NS"
+    helm install ingress-nginx ingress-nginx/ingress-nginx --version 4.12.2 -n $INGRESS_NS
 
     # Instal database Metrics Admin
     helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
