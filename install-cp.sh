@@ -55,6 +55,13 @@ MINIO_PASSWORD=""
 S3_KEYID=""
 S3_ACCESSKEY=""
 S3_SECRETKEY=""
+# ===== URLS Domains =====
+GATEWAY_DOMAIN=""
+DASHBOARD_DOMAIN=""
+API_DOMAIN=""
+REGISTRY_DOMAIN=""
+STORAGE_DOMAIN=""
+WALRUS_DOMAIN=""
 
 # ===== Vars Nginx Controller =====
 local CF_API_TOKEN=""
@@ -63,6 +70,7 @@ local EXT_DNS_NS="external-dns"
 local ORIGIN_CA_NS="origin-ca"
 local CLUSTER_ISSUER_NAME="origin-ca-issuer"
 local INGRESS_NS="ingress-nginx"
+
 
 
 
@@ -529,6 +537,12 @@ parse_cuemby_platform_args() {
             # --s3-secretkey)          S3_SECRETKEY="$2"; shift 2 ;;
             --cloudflare-api-token)  CF_API_TOKEN="$2"; shift 2 ;;
             --origin-ca-key)         S3_SECRETKEY="$2"; shift 2 ;;
+            --dashboard-domain)      DASHBOARD_DOMAIN="$2"; shift 2 ;;
+            --api-domain)            API_DOMAIN="$2"; shift 2 ;;
+            --registry-domain)       REGISTRY_DOMAIN="$2"; shift 2 ;;
+            --storage-domain)        STORAGE_DOMAIN="$2"; shift 2 ;;
+            --walrus-domain)         WALRUS_DOMAIN="$2"; shift 2 ;;
+            --gateway-domain)        GATEWAY_DOMAIN="$2"; shift 2 ;;
             --) shift; break ;;
             *)
             echo "Opción desconocida: $1" exit 1 ;;
@@ -587,6 +601,13 @@ prompt_missing_cuemby_platform_args() {
 
     [[ -z "$CF_API_TOKEN" ]] && CF_API_TOKEN="$(_prompt_secret 'Ingrese CF_API_TOKEN')"
     [[ -z "$ORIGIN_CA_KEY" ]] && ORIGIN_CA_KEY="$(_prompt_secret 'Ingrese ORIGIN_CA_KEY')"
+
+    [[ -z "$DASHBOARD_DOMAIN" ]] && DASHBOARD_DOMAIN="$(_prompt_plain 'Ingrese DASHBOARD_DOMAIN (p.ej. dashboard.net)')"
+    [[ -z "$API_DOMAIN" ]] && API_DOMAIN="$(_prompt_plain 'Ingrese API_DOMAIN (p.ej. api.net)')"
+    [[ -z "$REGISTRY_DOMAIN" ]] && REGISTRY_DOMAIN="$(_prompt_plain 'Ingrese REGISTRY_DOMAIN (p.ej. registry.net)')"
+    [[ -z "$STORAGE_DOMAIN" ]] && STORAGE_DOMAIN="$(_prompt_plain 'Ingrese STORAGE_DOMAIN (p.ej. storage.net)')"
+    [[ -z "$WALRUS_DOMAIN" ]] && WALRUS_DOMAIN="$(_prompt_plain 'Ingrese WALRUS_DOMAIN (p.ej. walrus.net)')"
+    [[ -z "$GATEWAY_DOMAIN" ]] && GATEWAY_DOMAIN="$(_prompt_plain 'Ingrese GATEWAY_DOMAIN (p.ej. gateway.net)')"
 
     print_status "All params successfully setted"
 }
@@ -826,14 +847,14 @@ install_cuemby_platform() {
 # MAIN
 # ========================
 main() {
-    # install_microk8s
-    # configure_kubeconfig_public_ip
-    # install_helm
-    # install_istio
-    # install_knative
-    # install_prometheus
-    # install_openebs
-    # install_nginx_ingress
+    install_microk8s
+    configure_kubeconfig_public_ip
+    install_helm
+    install_istio
+    install_knative
+    install_prometheus
+    install_openebs
+    install_nginx_ingress
     print_success "Cluster and dependencies installed successfully."
     print_success "kubeconfig file generate successfully"
     print_status "Validating platform arguments.."
