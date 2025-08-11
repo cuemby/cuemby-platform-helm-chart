@@ -395,11 +395,11 @@ EOF
         --set policy=sync
 
     # Install NGINX
-
+    print_status "Instalando NGINX Ingress Controller…"
     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
     helm repo update
     microk8s kubectl create namespace $INGRESS_NS || true
-    helm install ingress-nginx ingress-nginx/ingress-nginx --version 4.12.2 --namespace $INGRESS_NS
+    helm install ingress-nginx ingress-nginx/ingress-nginx --version 4.12.2 -n $INGRESS_NS
 
     # Instal database Metrics Admin
     helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
@@ -410,10 +410,11 @@ EOF
         --set "args[0]=--kubelet-insecure-tls"
 
     # Upgrade NGINX Ingress Controller
+    print_status "Upgrading NGINX Ingress Controller rules…"
     helm repo update
     helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
       --version 4.12.2 \
-      --namespace ingress-nginx \
+      -n $INGRESS_NS \
       --set controller.allowSnippetAnnotations=true \
       --set controller.config.annotations-risk-level=Critical \
       --set-string controller.config.server-snippet="location ~ /\\.git { deny all; return 404; } location ~ /Dockerfile { deny all; return 404; }" \
