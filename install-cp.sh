@@ -55,6 +55,12 @@ MINIO_PASSWORD=""
 S3_KEYID=""
 S3_ACCESSKEY=""
 S3_SECRETKEY=""
+
+GOTRUE_SMTP_HOST=""
+GOTRUE_SMTP_PORT=""
+GOTRUE_SMTP_ADMIN_EMAIL=""
+CCP_DOMAIN_APP=""
+
 # ===== URLS Domains =====
 GATEWAY_DOMAIN=""
 DASHBOARD_DOMAIN=""
@@ -544,6 +550,10 @@ parse_cuemby_platform_args() {
             --storage-domain)        STORAGE_DOMAIN="$2"; shift 2 ;;
             --walrus-domain)         WALRUS_DOMAIN="$2"; shift 2 ;;
             --gateway-domain)        GATEWAY_DOMAIN="$2"; shift 2 ;;
+            --gotrue-smtp-host)      GOTRUE_SMTP_HOST="$2"; shift 2 ;;
+            --gotrue-smtp-port)      GOTRUE_SMTP_PORT="$2"; shift 2 ;;
+            --gotrue-smtp-admin-email) GOTRUE_SMTP_ADMIN_EMAIL="$2"; shift 2 ;;
+            --ccp-domain-app)        CCP_DOMAIN_APP="$2"; shift 2 ;;
             --) shift; break ;;
             *)
             echo "Opción desconocida: $1" exit 1 ;;
@@ -609,6 +619,12 @@ prompt_missing_cuemby_platform_args() {
     [[ -z "$STORAGE_DOMAIN" ]] && STORAGE_DOMAIN="$(_prompt_plain 'Ingrese STORAGE_DOMAIN (p.ej. storage.net)')"
     [[ -z "$WALRUS_DOMAIN" ]] && WALRUS_DOMAIN="$(_prompt_plain 'Ingrese WALRUS_DOMAIN (p.ej. walrus.net)')"
     [[ -z "$GATEWAY_DOMAIN" ]] && GATEWAY_DOMAIN="$(_prompt_plain 'Ingrese GATEWAY_DOMAIN (p.ej. gateway.net)')"
+
+    [[ -z "$GOTRUE_SMTP_HOST" ]] && GOTRUE_SMTP_HOST="$(_prompt_plain 'Ingrese GOTRUE_SMTP_HOST (p.ej. smtp.resend.com)')"
+    [[ -z "$GOTRUE_SMTP_PORT" ]] && GOTRUE_SMTP_PORT="$(_prompt_plain 'Ingrese GOTRUE_SMTP_PORT (p.ej. 587)')"
+    [[ -z "$GOTRUE_SMTP_ADMIN_EMAIL" ]] && GOTRUE_SMTP_ADMIN_EMAIL="$(_prompt_plain 'Ingrese GOTRUE_SMTP_ADMIN_EMAIL (p.ej. admin@cuemby.com)')"
+
+    [[ -z "$CCP_DOMAIN_APP" ]] && CCP_DOMAIN_APP="$(_prompt_plain 'Ingrese DOMAIN_APP (p.ej. app-market.cuemby.net)')"
 
     print_status "All params successfully setted"
 }
@@ -709,35 +725,35 @@ install_cuemby_platform() {
         --set registry.redis.external.addr="cuemby-platform-redis-headless:6379" \
         --set registry.redis.external.password="${REDIS_PASSWORD}" \
         --set registry.redis.external.username="${REDIS_USERNAME}" \
-        --set-string registry.expose.ingress.hosts.core="harbor.market.cuemby.net" \
+        --set-string registry.expose.ingress.hosts.core="$REGISTRY_DOMAIN" \
         --set-string registry.expose.ingress.className="nginx" \
         --set-string registry.expose.ingress.controller="default" \
-        --set-string registry.expose.externalUrl="https://harbor.market.cuemby.net" \
+        --set-string registry.expose.externalUrl="https://$REGISTRY_DOMAIN" \
         --set-string registry.expose.harborAdminPassword="${HARBOR_PASSWORD}" \
         --set-json registry.expose.ingress.annotations='{
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":"harbor.market.cuemby.net",
+            "external-dns.alpha.kubernetes.io/hostname":'$REGISTRY_DOMAIN',
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
         }' \
         --set core.imgproxy.environment.IMGPROXY_KEY="c86ee9da270bd06f3f3f39ed33264d8124ada22a957f26452e385ee0c79f5f4d" \
         --set core.imgproxy.environment.IMGPROXY_KEY="bc4682582207c756d325115d8caeb71a" \
-        --set core.auth.environment.API_EXTERNAL_URL="http://api.shlab.cuemby.net" \
-        --set core.auth.environment.GOTRUE_SMTP_HOST="smtp.resend.com" \
-        --set core.auth.environment.GOTRUE_SMTP_PORT="587" \
-        --set core.auth.environment.GOTRUE_SMTP_ADMIN_EMAIL="team@mail.cuemby.io" \
+        --set core.auth.environment.API_EXTERNAL_URL="$API_DOMAIN" \
+        --set core.auth.environment.GOTRUE_SMTP_HOST="$GOTRUE_SMTP_HOST" \
+        --set core.auth.environment.GOTRUE_SMTP_PORT="$GOTRUE_SMTP_PORT" \
+        --set core.auth.environment.GOTRUE_SMTP_ADMIN_EMAIL="$GOTRUE_SMTP_ADMIN_EMAIL" \
         --set core.functions.dockerconfig.password="$DOCKERCONFIG_PASSWORD" \
         --set core.functions.dockerconfig.registry="$DOCKERCONFIG_REGISTRY" \
         --set core.functions.dockerconfig.username="$DOCKERCONFIG_USERNAME" \
-        --set core.functions.environment.CCP_DOMAIN_APP="app-market.cuemby.net" \
+        --set core.functions.environment.CCP_DOMAIN_APP="$CCP_DOMAIN_APP" \
         --set core.functions.environment.CP_CORE_REGISTRY_DEFAULT_PRODIVER="harbor" \
         --set core.functions.environment.HARBOR_USERNAME="${HARBOR_USERNAME}" \
         --set core.functions.environment.HARBOR_PASSWORD="${HARBOR_PASSWORD}" \
         --set core.functions.environment.HARBOR_BASE_URL="http://cuemby-platform-harbor-core:80/api/v2.0" \
-        --set core.functions.environment.HARBOR_REGISTRY="harbor.market.cuemby.net" \
+        --set core.functions.environment.HARBOR_REGISTRY="$REGISTRY_DOMAIN" \
         --set core.functions.environment.REDIS_HOSTNAME="cuemby-platform-redis-headless" \
         --set core.functions.environment.REDIS_PASSWORD="${REDIS_PASSWORD}" \
         --set core.functions.environment.REDIS_USERNAME="${REDIS_USERNAME}" \
@@ -745,22 +761,22 @@ install_cuemby_platform() {
         --set core.functions.environment.SUPA_URL="http://cuemby-platform-core-kong:8000" \
         --set core.functions.environment.CP_PLATFORM_V2_URL="http://cuemby-platform-core-kong:8000" \
         --set core.functions.environment.CP_PLATFORM_API_KEY="http://cuemby-platform-core-kong:8000" \
-        --set-string core.minio.ingress.hosts.core="minio.market.cuemby.net" \
+        --set-string core.minio.ingress.hosts.core="$STORAGE_DOMAIN" \
         --set-string core.minio.ingress.className="nginx" \
         --set-string core.minio.ingress.secretName="minio-market-cuemby-net-tls" \
         --set-json core.minio.ingress.annotations='{
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":"minio.market.cuemby.net",
+            "external-dns.alpha.kubernetes.io/hostname":'$STORAGE_DOMAIN',
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
         }' \
-        --set-string core.kong.ingress.hosts[0].host=api.market.cuemby.net \
+        --set-string core.kong.ingress.hosts[0].host=$API_DOMAIN \
         --set-string core.kong.ingress.hosts[0].paths[0].path="/" \
         --set-string core.kong.ingress.hosts[0].paths[0].pathType=Prefix \
-        --set-string core.kong.ingress.tls[0].hosts[0]=api.market.cuemby.net \
+        --set-string core.kong.ingress.tls[0].hosts[0]=$API_DOMAIN \
         --set-string core.kong.ingress.tls[0].secretName=api-market-cuemby.net-tls \
         --set-string core.kong.ingress.className="nginx" \
         --set-string core.kong.ingress.secretName="api-market-cuemby-net-tls" \
@@ -768,7 +784,7 @@ install_cuemby_platform() {
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":"api.market.cuemby.net",
+            "external-dns.alpha.kubernetes.io/hostname":'$API_DOMAIN',
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
@@ -798,16 +814,16 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
         }' \
-        --set-string dashboard.dashboard.ingress.host="dashboard.market.cuemby.net" \
+        --set-string dashboard.dashboard.ingress.host="$DASHBOARD_DOMAIN" \
         --set-string dashboard.dashboard.ingress.className="nginx" \
-        --set-string dashboard.dashboard.ingress.tls[0].hosts[0]=dashboard.market.cuemby.net \
+        --set-string dashboard.dashboard.ingress.tls[0].hosts[0]=$DASHBOARD_DOMAIN \
         --set-string dashboard.dashboard.ingress.tls[0].secretName=dashboard-market-cuemby.net-tls \
         --set-string dashboard.dashboard.ingress.secretName="dashboard-market-cuemby-net-tls" \
         --set-json dashboard.dashboard.ingress.annotations='{
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":"dashboard.market.cuemby.net",
+            "external-dns.alpha.kubernetes.io/hostname":'$DASHBOARD_DOMAIN',
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
@@ -816,27 +832,27 @@ install_cuemby_platform() {
         --set walrus.secret.minio.rootUser="$MINIO_USERNAME" \
         --set walrus.secret.minio.rootPassword="$MINIO_PASSWORD" \
         --set walrus.walrus.environment.DATABASE_SERVICE_HOST="cuemby-platform-core-db.cuemby-system.svc.cluster.local" \
-        --set walrus.walrus.ingress.hosts.core="walrus.market.cuemby.net" \
+        --set walrus.walrus.ingress.hosts.core="$WALRUS_DOMAIN" \
         --set walrus.walrus.ingress.className="nginx" \
         --set walrus.walrus.ingress.secretName="walrus-market-cuemby-net-tls" \
         --set-json walrus.walrus.ingress.annotations='{
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":"walrus.market.cuemby.net",
+            "external-dns.alpha.kubernetes.io/hostname":'$WALRUS_DOMAIN',
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
         }' \
         --set apiGateway.apiGateway.environment.BACKEND_HOST="http://cuemby-platform-core-kong:8000" \
-        --set-string apiGateway.apiGateway.ingress.hosts.core="api-gateway.market.cuemby.net" \
+        --set-string apiGateway.apiGateway.ingress.hosts.core="$GATEWAY_DOMAIN" \
         --set-string apiGateway.apiGateway.ingress.className="nginx" \
         --set-string apiGateway.apiGateway.ingress.secretName="api-gateway-market-cuemby-net-tls" \
         --set-json apiGateway.apiGateway.ingress.annotations='{
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":"api-gateway.market.cuemby.net",
+            "external-dns.alpha.kubernetes.io/hostname":'$GATEWAY_DOMAIN',
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
