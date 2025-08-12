@@ -537,7 +537,7 @@ parse_cuemby_platform_args() {
             # --s3-accesskey)          S3_ACCESSKEY="$2"; shift 2 ;;
             # --s3-secretkey)          S3_SECRETKEY="$2"; shift 2 ;;
             --cloudflare-api-token)  CF_API_TOKEN="$2"; shift 2 ;;
-            --origin-ca-key)         S3_SECRETKEY="$2"; shift 2 ;;
+            --origin-ca-key)         ORIGIN_CA_KEY="$2"; shift 2 ;;
             --dashboard-domain)      DASHBOARD_DOMAIN="$2"; shift 2 ;;
             --api-domain)            API_DOMAIN="$2"; shift 2 ;;
             --registry-domain)       REGISTRY_DOMAIN="$2"; shift 2 ;;
