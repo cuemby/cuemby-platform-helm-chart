@@ -734,7 +734,7 @@ install_cuemby_platform() {
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":'$REGISTRY_DOMAIN',
+            "external-dns.alpha.kubernetes.io/hostname":"'$REGISTRY_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
@@ -768,7 +768,7 @@ install_cuemby_platform() {
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":'$STORAGE_DOMAIN',
+            "external-dns.alpha.kubernetes.io/hostname":"'$STORAGE_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
@@ -784,7 +784,7 @@ install_cuemby_platform() {
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":'$API_DOMAIN',
+            "external-dns.alpha.kubernetes.io/hostname":"'$API_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
@@ -823,7 +823,7 @@ install_cuemby_platform() {
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":'$DASHBOARD_DOMAIN',
+            "external-dns.alpha.kubernetes.io/hostname":"'$DASHBOARD_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
@@ -839,7 +839,7 @@ install_cuemby_platform() {
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":'$WALRUS_DOMAIN',
+            "external-dns.alpha.kubernetes.io/hostname":"'$WALRUS_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
@@ -852,7 +852,7 @@ install_cuemby_platform() {
             "cert-manager.io/issuer":"origin-ca-issuer",
             "cert-manager.io/issuer-kind":"ClusterOriginIssuer",
             "cert-manager.io/issuer-group":"cert-manager.k8s.cloudflare.com",
-            "external-dns.alpha.kubernetes.io/hostname":'$GATEWAY_DOMAIN',
+            "external-dns.alpha.kubernetes.io/hostname":"'$GATEWAY_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
