@@ -419,12 +419,16 @@ EOF
     print_status "Upgrading NGINX Ingress Controller rules…"
     helm repo update
     helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-      --version 4.12.2 \
-      -n $INGRESS_NS \
-      --set controller.allowSnippetAnnotations=true \
-      --set controller.config.annotations-risk-level=Critical \
-      --set-string controller.config.server-snippet="location ~ /\\.git { deny all; return 404; } location ~ /Dockerfile { deny all; return 404; }" \
-      --set controller.config.proxy-body-size="1500m"
+        --version 4.12.2 \
+        -n $INGRESS_NS \
+        --set controller.allowSnippetAnnotations=true \
+        --set controller.config.annotations-risk-level=Critical \
+        --set-string controller.config.server-snippet="location ~ /\\.git { deny all; return 404; } location ~ /Dockerfile { deny all; return 404; }" \
+        --set controller.config.proxy-body-size="1500m" \
+        --set controller.admissionWebhooks.enabled=true \
+        --set controller.admissionWebhooks.patch.enabled=true \
+        --set controller.admissionWebhooks.failurePolicy=Ignore \
+        --set controller.admissionWebhooks.certManager.enabled=false
     
     print_success "NGINX Ingress Controller successfully installed"
 }
