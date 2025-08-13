@@ -136,11 +136,13 @@ install_microk8s() {
     # ========================
     print_status "Verificando MetalLB..."
     if ! microk8s status | grep -q "metallb: enabled"; then
-        LOCAL_IP=$(hostname -I | awk '{print $1}')
-        SUBNET=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
-        START_IP="${SUBNET}.240"
-        END_IP="${SUBNET}.250"
-        METALLB_RANGE="${START_IP}-${END_IP}"
+        PUBLIC_IP=$(curl -s ifconfig.me)
+        print_status "IP pública detectada: $PUBLIC_IP"
+        # LOCAL_IP=$(hostname -I | awk '{print $1}')
+        # SUBNET=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
+        # START_IP="${SUBNET}.240"
+        # END_IP="${SUBNET}.250"
+        METALLB_RANGE="${PUBLIC_IP}-${PUBLIC_IP}"
         print_status "Detectado subnet local: $SUBNET usando rango $METALLB_RANGE"
         microk8s enable metallb:$METALLB_RANGE
     fi
@@ -388,7 +390,10 @@ EOF
     microk8s kubectl get ns "$EXT_DNS_NS" >/dev/null 2>&1 || microk8s kubectl create ns "$EXT_DNS_NS"
 
     microk8s kubectl -n "$EXT_DNS_NS" create secret generic cloudflare-api-token \
-        --from-literal=cloudflare_api_token="$CF_API_TOKEN"
+        --from-literal=cloudflare_api_token="'$CF_API_TOKEN'"
+    
+    microk8s kubectl -n "$EXT_DNS_NS" get secret cloudflare-api-token \
+        -o jsonpath='{.data.cloudflare_api_token}' | base64 -d; echo
 
     print_status "ExternalDNS (Bitnami) con provider Cloudflare…"
     helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -397,7 +402,7 @@ EOF
         -n "$EXT_DNS_NS" \
         --set provider=cloudflare \
         --set txtOwnerId="cuemby-lab" \
-        --set cloudflare.apiTokenSecretName=cloudflare-api-token \
+        --set cloudflare.secretName=cloudflare-api-token \
         --set policy=sync
 
     # Install NGINX
