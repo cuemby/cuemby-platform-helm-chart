@@ -143,7 +143,6 @@ install_microk8s() {
         # START_IP="${SUBNET}.240"
         # END_IP="${SUBNET}.250"
         METALLB_RANGE="${PUBLIC_IP}-${PUBLIC_IP}"
-        print_status "Detectado subnet local: $SUBNET usando rango $METALLB_RANGE"
         microk8s enable metallb:$METALLB_RANGE
     fi
 
