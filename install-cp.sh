@@ -77,7 +77,10 @@ ORIGIN_CA_NS="origin-ca"
 CLUSTER_ISSUER_NAME="origin-ca-issuer"
 INGRESS_NS="ingress-nginx"
 
-
+# ===== Vars Notify Email =====
+NOTIFY_EMAIL="${NOTIFY_EMAIL:-}"
+RESEND_API_KEY="${RESEND_API_KEY:-}"
+RESEND_FROM="${RESEND_FROM:-}"
 
 
 # ========================
@@ -205,10 +208,9 @@ configure_kubeconfig_public_ip() {
 }
 
 install_istio() {
-    print_status "Installing Istio (CRDs + control-plane + gateway) with Helm..."
-    create_namespace "$NAMESPACE_ISTIO"
+    print_status "Installing Istio with Helm..."
+    create_namespace $NAMESPACE_ISTIO
 
-    # Repo Istio
     if ! microk8s helm3 repo list | grep -q "istio"; then
         microk8s helm3 repo add istio https://istio-release.storage.googleapis.com/charts
     else
@@ -216,125 +218,89 @@ install_istio() {
     fi
     microk8s helm3 repo update
 
-    # Values remotos
     ISTIO_VALUES="https://raw.githubusercontent.com/cuemby/cuemby-platform-helm-chart/refs/heads/main/dependencies/istio/istio.yaml"
     ISTIO_GATEWAY_VALUES="https://raw.githubusercontent.com/cuemby/cuemby-platform-helm-chart/refs/heads/main/dependencies/istio/istio-gateway.yaml"
-
-    # 1) CRDs (istio/base) — NECESARIO para que exista networking.istio.io/*
-    print_status "Installing Istio CRDs (istio/base)..."
-    microk8s helm3 upgrade --install istio-base istio/base \
-        -n "$NAMESPACE_ISTIO" \
-        --wait --timeout="$TIMEOUT"
-
-    # Esperar a que aparezcan CRDs clave (loop corto, fail-fast)
-    for crd in gateways.networking.istio.io virtualservices.networking.istio.io destinationrules.networking.istio.io; do
-        tries=0
-        until microk8s kubectl get crd "$crd" >/dev/null 2>&1 || [ $tries -ge 12 ]; do
-            print_status "Waiting for CRD $crd ..."
-            sleep 5
-            ((tries++))
-        done
-        if ! microk8s kubectl get crd "$crd" >/dev/null 2>&1; then
-            print_error "CRD $crd not found after waiting. Aborting Istio install."
-        fi
-    done
-
-    # 2) Control-plane (istiod)
-    print_status "Installing istiod (control-plane)..."
+    print_status "Installing Istio with custom values from ./dependencies/istio/..."
+    print_status "Using Istio values: $ISTIO_VALUES"
     microk8s helm3 upgrade --install istiod istio/istiod \
-        -n "$NAMESPACE_ISTIO" \
+        -n $NAMESPACE_ISTIO \
         -f "$ISTIO_VALUES" \
-        --wait --timeout="$TIMEOUT"
+        --wait --timeout=$TIMEOUT
 
-    # 3) Ingress Gateway (istio/gateway)
-    print_status "Installing Istio Ingress Gateway..."
     microk8s helm3 upgrade --install istio-ingressgateway istio/gateway \
-        -n "$NAMESPACE_ISTIO" \
+        -n $NAMESPACE_ISTIO \
         -f "$ISTIO_GATEWAY_VALUES" \
-        --wait --timeout="$TIMEOUT"
+        --wait --timeout=$TIMEOUT
 
-    # Verificar istiod
-    wait_for_deployment "$NAMESPACE_ISTIO" "istiod"
+    wait_for_deployment $NAMESPACE_ISTIO "istiod"
 
-    print_success "Istio installed successfully (base + istiod + gateway)."
+    print_success "Istio successfully installed with Helm."
 }
 
 install_knative() {
     print_status "Installing Knative Operator..."
-    create_namespace "$NAMESPACE_KNATIVE_OPERATOR"
-    create_namespace "$NAMESPACE_KNATIVE_SERVING"
+    create_namespace $NAMESPACE_KNATIVE_OPERATOR
+    create_namespace $NAMESPACE_KNATIVE_SERVING
 
-    # Operator
+    print_status "Installing Knative Operator using kubectl..."
     microk8s kubectl apply -f https://github.com/knative/operator/releases/download/knative-v1.15.0/operator.yaml
 
     print_status "Waiting for the operator to be ready..."
-    microk8s kubectl wait --for=condition=available --timeout="$TIMEOUT" \
-        deployment/knative-operator -n "$NAMESPACE_KNATIVE_OPERATOR"
+    microk8s kubectl wait --for=condition=available --timeout=$TIMEOUT deployment/knative-operator -n $NAMESPACE_KNATIVE_OPERATOR
 
-    # KnativeServing + net-istio habilitado
-    print_status "Creating KnativeServing (net-istio enabled)..."
+    print_status "Installing KnativeServing..."
     cat <<EOF | microk8s kubectl apply -f -
 apiVersion: operator.knative.dev/v1beta1
 kind: KnativeServing
 metadata:
   name: knative-serving
-  namespace: ${NAMESPACE_KNATIVE_SERVING}
+  namespace: $NAMESPACE_KNATIVE_SERVING
 spec:
   config:
     network:
-      # Clase de ingress de Knative para Istio
       ingress-class: "istio.ingress.networking.knative.dev"
   ingress:
     istio:
       enabled: true
 EOF
 
-    # Espera rápida con fail‑fast si falta Gateway de Istio
+    print_status "Waiting for KnativeServing to be ready..."
     local max_attempts=5
-    local delay_secs=8
     local attempt=1
 
     while [ $attempt -le $max_attempts ]; do
         print_status "Attempt $attempt/$max_attempts - Checking KnativeServing status..."
 
-        if microk8s kubectl get knativeserving knative-serving -n "$NAMESPACE_KNATIVE_SERVING" &>/dev/null; then
-            local ready_status ready_reason ready_msg
-            ready_status="$(microk8s kubectl get knativeserving knative-serving -n "$NAMESPACE_KNATIVE_SERVING" \
-              -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "Unknown")"
-            ready_reason="$(microk8s kubectl get knativeserving knative-serving -n "$NAMESPACE_KNATIVE_SERVING" \
-              -o jsonpath='{.status.conditions[?(@.type=="Ready")].reason}' 2>/dev/null || true)"
-            ready_msg="$(microk8s kubectl get knativeserving knative-serving -n "$NAMESPACE_KNATIVE_SERVING" \
-              -o jsonpath='{.status.conditions[?(@.type=="Ready")].message}' 2>/dev/null || true)"
-
-            print_status "KnativeServing status: ${ready_status:-Unknown} (${ready_reason:-})"
+        if microk8s kubectl get knativeserving knative-serving -n $NAMESPACE_KNATIVE_SERVING &> /dev/null; then
+            local ready_status=$(microk8s kubectl get knativeserving knative-serving -n $NAMESPACE_KNATIVE_SERVING -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "Unknown")
+            print_status "KnativeServing status: $ready_status"
 
             if [ "$ready_status" = "True" ]; then
                 print_success "KnativeServing is ready!"
                 break
+            elif [ "$ready_status" = "False" ]; then
+                print_warning "KnativeServing is not ready. Checking details..."
+                microk8s kubectl get knativeserving knative-serving -n $NAMESPACE_KNATIVE_SERVING -o yaml | grep -A 10 "conditions:"
             fi
-
-            if [ "$ready_status" = "False" ] && echo "$ready_msg" | grep -qiE 'please install istio|no matches for kind "Gateway"|ingress plugin'; then
-                print_error "Knative failed early (${ready_reason}): $ready_msg"
-                return 1
-            fi
-
-            print_warning "KnativeServing not ready yet. Reason: ${ready_reason:-n/a}"
-            microk8s kubectl get knativeserving knative-serving -n "$NAMESPACE_KNATIVE_SERVING" -o yaml \
-              | grep -A 10 "conditions:" || true
         else
-            print_warning "KnativeServing CR not found yet, waiting…"
+            print_warning "KnativeServing not found, waiting..."
         fi
 
+        print_status "Pods status in $NAMESPACE_KNATIVE_SERVING:"
+        microk8s kubectl get pods -n $NAMESPACE_KNATIVE_SERVING 2>/dev/null || echo "No pods yet"
+
         if [ $attempt -eq $max_attempts ]; then
-            print_warning "Timeout reached. Continuing."
+            print_warning "Timeout reached, continuing. Please verify manually with:"
+            echo "kubectl get knativeserving knative-serving -n $NAMESPACE_KNATIVE_SERVING"
+            echo "kubectl get pods -n $NAMESPACE_KNATIVE_SERVING"
             break
         fi
 
-        sleep "$delay_secs"
+        sleep 10
         ((attempt++))
     done
 
-    print_success "Knative Operator and Serving steps completed."
+    print_success "Knative Operator and Serving successfully installed."
 }
 
 install_prometheus() {
@@ -599,6 +565,9 @@ parse_cuemby_platform_args() {
             --gotrue-smtp-port)      GOTRUE_SMTP_PORT="$2"; shift 2 ;;
             --gotrue-smtp-admin-email) GOTRUE_SMTP_ADMIN_EMAIL="$2"; shift 2 ;;
             --ccp-domain-app)        CCP_DOMAIN_APP="$2"; shift 2 ;;
+            --notify-email)          NOTIFY_EMAIL="$2"; shift 2 ;;
+            --resend-api-key)        RESEND_API_KEY="$2"; shift 2 ;;
+            --resend-from)           RESEND_FROM="$2"; shift 2 ;;
             --) shift; break ;;
             *)
             echo "Opción desconocida: $1" exit 1 ;;
@@ -670,6 +639,10 @@ prompt_missing_cuemby_platform_args() {
     [[ -z "$GOTRUE_SMTP_ADMIN_EMAIL" ]] && GOTRUE_SMTP_ADMIN_EMAIL="$(_prompt_plain 'Ingrese GOTRUE_SMTP_ADMIN_EMAIL (p.ej. admin@cuemby.com)')"
 
     [[ -z "$CCP_DOMAIN_APP" ]] && CCP_DOMAIN_APP="$(_prompt_plain 'Ingrese DOMAIN_APP (p.ej. app-market.cuemby.net)')"
+
+    [[ -z "$NOTIFY_EMAIL" ]] && NOTIFY_EMAIL="$(_prompt_plain 'Ingrese NOTIFY_EMAIL (p.ej. admin@cuemby.com)')"
+    [[ -z "$RESEND_API_KEY" ]] && RESEND_API_KEY="$(_prompt_secret 'Ingrese RESEND_API_KEY')"
+    [[ -z "$RESEND_FROM" ]] && RESEND_FROM="$(_prompt_plain 'Ingrese RESEND_FROM (p.ej. admin@cuemby.com)')"
 
     print_status "All params successfully setted"
 }
@@ -905,6 +878,64 @@ install_cuemby_platform() {
         --wait --timeout=600s
 }
 
+# ===========================
+# Notity By Email
+# ===========================
+notify_email() {
+  local to="$NOTIFY_EMAIL" subject="$1" body="$2"
+  # 1) Resend API (recomendado)
+  if [[ -n "${RESEND_API_KEY:-}" && -n "${RESEND_FROM:-}" ]]; then
+    # Necesita 'jq' (instálalo si no lo tienes: apt-get install -y jq)
+    if ! command -v jq >/dev/null 2>&1; then
+      echo "[WARNING] 'jq' no está instalado; no puedo usar la API de Resend."
+    else
+      curl -sS https://api.resend.com/emails \
+        -H "Authorization: Bearer ${RESEND_API_KEY}" \
+        -H "Content-Type: application/json" \
+        -d "$(jq -n \
+              --arg from "$RESEND_FROM" \
+              --arg to   "$to" \
+              --arg subject "$subject" \
+              --arg text "$body" \
+              '{from:$from,to:[$to],subject:$subject,text:$text}')" \
+        >/dev/null || echo "[WARNING] Falló el envío por Resend."
+      return
+    fi
+  fi
+
+  # 2) mailx (si está disponible y configurado)
+  if command -v mailx >/dev/null 2>&1; then
+    printf "%s\n" "$body" | mailx -s "$subject" "$to" || \
+      echo "[WARNING] Falló el envío con mailx."
+    return
+  fi
+
+  # 3) sendmail (si existe)
+  if command -v sendmail >/dev/null 2>&1; then
+    /usr/sbin/sendmail -t <<EOF
+From: ${RESEND_FROM:-noreply@local}
+To: ${to}
+Subject: ${subject}
+
+${body}
+EOF
+    return
+  fi
+
+  echo "[WARNING] No hay método disponible para enviar correo (Resend/mailx/sendmail)."
+}
+
+build_install_summary() {
+  cat <<EOF
+Instalación completada ✔
+
+Ingresses:
+$(microk8s kubectl get ing -A 2>/dev/null || echo "sin ingresses")
+
+¡Listo!
+EOF
+}
+
 # ========================
 # MAIN
 # ========================
@@ -925,6 +956,8 @@ main() {
     print_status "Installing Cuemby Platform..."
     install_cuemby_platform
     print_success "CP installed successfully."
+    notify_email "✅ Instalación completada en $(hostname)" \
+        "$(build_install_summary)"
 }
 
 main "$@"
