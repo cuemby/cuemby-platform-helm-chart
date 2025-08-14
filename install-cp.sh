@@ -119,37 +119,91 @@ create_namespace() {
 # Install MicroK8s & Public IP Setup
 # ========================
 install_microk8s() {
-    print_status "Instalando MicroK8s..."
-    snap install microk8s --classic --channel=1.30/stable
+  print_status "Instalando MicroK8s..."
+  snap install microk8s --classic --channel=1.30/stable
 
-    # Si no es root, agregar usuario al grupo
-    if [ "$(id -u)" -ne 0 ]; then
-        print_status "Agregando usuario actual al grupo microk8s..."
-        sudo usermod -a -G microk8s "$USER"
+  if [ "$(id -u)" -ne 0 ]; then
+    print_status "Agregando usuario actual al grupo microk8s..."
+    sudo usermod -a -G microk8s "$USER"
+  fi
+
+  print_status "Esperando a que MicroK8s esté listo..."
+  microk8s status --wait-ready
+
+  print_status "Habilitando addons básicos..."
+  microk8s enable dns storage helm3
+
+  # ===== MetalLB =====
+  print_status "Configurando MetalLB…"
+  # Interfaz por defecto y su CIDR
+  DEF_IFACE=$(ip route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
+  LOCAL_CIDR=$(ip -o -4 addr show dev "$DEF_IFACE" | awk '{print $4}')           # ej. 192.168.1.10/24
+  LOCAL_IP=${LOCAL_CIDR%/*}
+  LOCAL_NET=$(ipcalc -n "$LOCAL_CIDR" | awk -F= '/NETWORK/{print $2}')           # requiere paquete ipcalc
+  LOCAL_BASE=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
+  PUBLIC_IP=$(curl -s --max-time 5 https://ifconfig.me || true)
+
+  # Permitir override manual exportando METALLB_RANGE antes de ejecutar el script
+  if [ -n "${METALLB_RANGE:-}" ]; then
+    POOL_RANGE="$METALLB_RANGE"
+    print_status "Usando rango MetalLB de entorno: $POOL_RANGE"
+  else
+    # ¿La IP pública pertenece a la subred de la interfaz?
+    if ipcalc -c "$LOCAL_CIDR" >/dev/null 2>&1 && ipcalc -n "$LOCAL_CIDR" | grep -q "$LOCAL_BASE"; then
+      if [ -n "$PUBLIC_IP" ] && ipcalc -c "$PUBLIC_IP/32" >/dev/null 2>&1; then
+        # Comprobación simple de pertenencia a la misma /24
+        if [[ "$PUBLIC_IP" == "$LOCAL_BASE."* ]]; then
+          POOL_RANGE="${PUBLIC_IP}-${PUBLIC_IP}"
+          print_status "IP pública $PUBLIC_IP está en la misma subred, MetalLB anunciará esa IP."
+        else
+          POOL_RANGE="${LOCAL_BASE}.240-${LOCAL_BASE}.250"
+          print_warning "La IP pública ($PUBLIC_IP) no está en la misma L2 que $LOCAL_IP. Se usará rango local $POOL_RANGE.
+Si necesitas que la IP pública responda, configura un NAT / regla DNAT 80/443 → una IP del rango MetalLB."
+        fi
+      else
+        POOL_RANGE="${LOCAL_BASE}.240-${LOCAL_BASE}.250"
+        print_warning "No se pudo detectar IP pública; usando rango local $POOL_RANGE."
+      fi
+    else
+      POOL_RANGE="${LOCAL_BASE}.240-${LOCAL_BASE}.250"
+      print_warning "No se pudo validar la subred local; usando rango $POOL_RANGE."
     fi
+  fi
 
-    print_status "Esperando a que MicroK8s esté completamente operativo..."
-    microk8s status --wait-ready
+  # Habilita MetalLB sin rango y aplica un pool/L2Advertisement explícitos
+  if ! microk8s status | grep -q "metallb: enabled"; then
+    microk8s enable metallb
+  fi
 
-    print_status "Habilitando complementos básicos (dns, storage, helm3)..."
-    microk8s enable dns storage helm3
+  # Crea/actualiza el pool y el anuncio L2 apuntando a la interfaz por defecto
+  cat <<EOF | microk8s kubectl apply -f -
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: public-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - "$POOL_RANGE"
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: public-adv
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - public-pool
+  interfaces:
+    - "$DEF_IFACE"
+EOF
 
-    # ========================
-    # Enable MetalLB with automatic network detection
-    # ========================
-    print_status "Verificando MetalLB..."
-    if ! microk8s status | grep -q "metallb: enabled"; then
-        PUBLIC_IP=$(curl -s ifconfig.me)
-        print_status "IP pública detectada: $PUBLIC_IP"
-        # LOCAL_IP=$(hostname -I | awk '{print $1}')
-        # SUBNET=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
-        # START_IP="${SUBNET}.240"
-        # END_IP="${SUBNET}.250"
-        METALLB_RANGE="${PUBLIC_IP}-${PUBLIC_IP}"
-        microk8s enable metallb:$METALLB_RANGE
-    fi
+  print_success "MetalLB configurado con rango: $POOL_RANGE (iface: $DEF_IFACE)."
 
-    print_success "MicroK8s instalado."
+  print_status "Recuerda abrir puertos 80/tcp y 443/tcp hacia la IP externa que asigne MetalLB."
+  print_status "Ejemplos:"
+  echo "  # UFW local (si aplica):    sudo ufw allow 80/tcp; sudo ufw allow 443/tcp"
+  echo "  # Seguridad del cloud: abre 80/443 al External IP que verás en el Service LB."
 }
 
 # ========================
