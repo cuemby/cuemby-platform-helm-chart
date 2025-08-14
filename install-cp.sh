@@ -392,7 +392,7 @@ EOF
     microk8s kubectl get ns "$EXT_DNS_NS" >/dev/null 2>&1 || microk8s kubectl create ns "$EXT_DNS_NS"
 
     microk8s kubectl -n "$EXT_DNS_NS" create secret generic cloudflare-api-token \
-        --from-literal=cloudflare_api_token="'$CF_API_TOKEN'"
+        --from-literal=cloudflare_api_token="$CF_API_TOKEN"
     
     microk8s kubectl -n "$EXT_DNS_NS" get secret cloudflare-api-token \
         -o jsonpath='{.data.cloudflare_api_token}' | base64 -d; echo
@@ -723,6 +723,8 @@ install_cuemby_platform() {
         --set configurator.configurator.environment.PGPASSWORD="${PG_PASSWORD}" \
         --set configurator.configurator.environment.API_BASE_URL="http://cuemby-platform-core-kong:8000" \
         --set configurator.configurator.environment.ANON_KEY="$JWT_ANON_KEY" \
+        --set configurator.configurator.image.repository="netsaj/cp-configurator" \
+        --set configurator.configurator.image.tag="v2.0.61" \
         --set platform.platform.dockerconfig.password="$DOCKERCONFIG_PASSWORD" \
         --set platform.platform.dockerconfig.registry="$DOCKERCONFIG_REGISTRY" \
         --set platform.platform.dockerconfig.username="$DOCKERCONFIG_USERNAME" \
@@ -732,6 +734,8 @@ install_cuemby_platform() {
         --set platform.platform.environment.DB_PASSWORD="${PG_PASSWORD}" \
         --set platform.platform.environment.DB_USERNAME="${PG_USERNAME}" \
         --set platform.platform.environment.API_KEY="${API_KEY}" \
+        --set platform.platform.image.repository="netsaj/cp-platform" \
+        --set platform.platform.image.tag="v1.0.34-dev.1" \
         --set platform.rabbitmq.auth.password="${RABBITMQ_PASSWORD}" \
         --set platform.rabbitmq.auth.username="${RABBITMQ_USERNAME}" \
         --set platform.redis.auth.password="${REDIS_PASSWORD}" \
@@ -779,6 +783,8 @@ install_cuemby_platform() {
         --set core.functions.environment.SUPA_URL="http://cuemby-platform-core-kong:8000" \
         --set core.functions.environment.CP_PLATFORM_V2_URL="http://cuemby-platform-core-kong:8000" \
         --set core.functions.environment.CP_PLATFORM_API_KEY="http://cuemby-platform-core-kong:8000" \
+        --set core.functions.initContainers.image.repository="netsaj/cp-functions" \
+        --set core.functions.initContainers.image.tag="v2.0.61" \
         --set-string core.minio.ingress.hosts.core="$STORAGE_DOMAIN" \
         --set-string core.minio.ingress.className="nginx" \
         --set-string core.minio.ingress.secretName="minio-market-cuemby-net-tls" \
@@ -832,6 +838,8 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
         }' \
+        --set dashboard.dashboard.image.repository="netsaj/cp-dashboard" \
+        --set dashboard.dashboard.image.tag="latest" \
         --set-string dashboard.dashboard.ingress.host="$DASHBOARD_DOMAIN" \
         --set-string dashboard.dashboard.ingress.className="nginx" \
         --set-string dashboard.dashboard.ingress.tls[0].hosts[0]=$DASHBOARD_DOMAIN \
@@ -875,6 +883,8 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
         }' \
+        --set apiGateway.apiGateway.image.repository="netsaj/cp-apigw" \
+        --set apiGateway.apiGateway.image.tag="v0.0.1-dev.8" \
         --wait --timeout=600s
 }
 
