@@ -950,6 +950,9 @@ EOF
 # MAIN
 # ========================
 main() {
+    print_status "Validating platform arguments.."
+    parse_cuemby_platform_args "$@"
+    prompt_missing_cuemby_platform_args
     install_microk8s
     configure_kubeconfig_public_ip
     install_helm
@@ -960,9 +963,6 @@ main() {
     install_nginx_ingress
     print_success "Cluster and dependencies installed successfully."
     print_success "kubeconfig file generate successfully"
-    print_status "Validating platform arguments.."
-    parse_cuemby_platform_args "$@"
-    prompt_missing_cuemby_platform_args
     print_status "Installing Cuemby Platform..."
     install_cuemby_platform
     print_success "CP installed successfully."
