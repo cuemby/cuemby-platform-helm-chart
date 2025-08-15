@@ -150,35 +150,24 @@ install_microk8s() {
   print_status "IP local detectada: ${LOCAL_IP:-desconocida}"
   print_status "IP pública detectada: ${PUBLIC_IP:-desconocida}"
 
-  # ¿La IP pública es la misma que la local? (host con IP pública directa)
-  USE_PUBLIC_RANGE=false
-  if [ -n "$PUBLIC_IP" ] && [ -n "$LOCAL_IP" ] && [ "$PUBLIC_IP" = "$LOCAL_IP" ]; then
-    USE_PUBLIC_RANGE=true
+  # Interfaz de salida (la que usa el nodo para Internet)
+  local IFACE
+  IFACE="$(ip route get 1.1.1.1 | awk '{print $5; exit}')"
+
+  # ¿La IP pública ya está en la NIC?
+  if ! ip -4 addr show dev "$IFACE" | grep -q " ${PUBLIC_IP}/"; then
+    echo "[INFO] La IP pública $PUBLIC_IP no está en $IFACE."
+    echo "[INFO] Intentando asignarla como /32 al host (requiere que tu proveedor lo permita)."
+    # Si tu red lo soporta, esto fija la IP en la NIC:
+    sudo ip addr add "${PUBLIC_IP}/32" dev "$IFACE" || {
+      echo "[WARN] No se pudo asignar ${PUBLIC_IP}/32 a ${IFACE}. Si tu proveedor no soporta IP pública en la NIC, no funcionará el anuncio L2."
+    }
   fi
 
-  # -----------------------------------------
-  # Configurar MetalLB sin depender de ipcalc
-  # -----------------------------------------
-  print_status "Verificando MetalLB…"
-  if ! microk8s status | grep -q "metallb: enabled"; then
-    if $USE_PUBLIC_RANGE; then
-      # El nodo tiene IP pública directamente: anunciar exactamente esa IP
-      METALLB_RANGE="${PUBLIC_IP}-${PUBLIC_IP}"
-      print_status "Anunciando IP pública única con MetalLB: $METALLB_RANGE"
-      microk8s enable "metallb:${METALLB_RANGE}"
-    else
-      # Nodo detrás de NAT: usar un rango /24 de la red local (x.y.z.240-250)
-      BASE="$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')"
-      START_IP="${BASE}.240"
-      END_IP="${BASE}.250"
-      METALLB_RANGE="${START_IP}-${END_IP}"
-      print_status "Host en red privada/NAT. Usando rango local: $METALLB_RANGE"
-      microk8s enable "metallb:${METALLB_RANGE}"
-      print_warning "Si necesitas exponer servicios públicamente, configura port‑forward/NAT del proveedor hacia una IP de este rango."
-    fi
-  else
-    print_status "MetalLB ya está habilitado; omitiendo enable."
-  fi
+  echo "[INFO] Habilitando MetalLB con rango único ${PUBLIC_IP}-${PUBLIC_IP}…"
+  # Si ya estaba configurado con otro rango, reconfigura:
+  microk8s status | grep -q "metallb: enabled" && microk8s disable metallb || true
+  microk8s enable "metallb:${PUBLIC_IP}-${PUBLIC_IP}"
 
   print_success "MicroK8s instalado y MetalLB configurado."
 }
