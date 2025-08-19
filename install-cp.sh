@@ -24,6 +24,9 @@ NAMESPACE_KNATIVE_SERVING="knative-serving"
 NAMESPACE_MONITORING="cuemby-system"
 TIMEOUT="600s"
 
+# ===== Public IP ========
+PUBLIC_IP=$(curl -s ifconfig.me)
+
 # ===== Vars Cuemby Platform =====
 DOCKERCONFIG_PASSWORD=""
 DOCKERCONFIG_REGISTRY=""
@@ -139,7 +142,6 @@ install_microk8s() {
     # ========================
     print_status "Verificando MetalLB..."
     if ! microk8s status | grep -q "metallb: enabled"; then
-        PUBLIC_IP=$(curl -s ifconfig.me)
         print_status "IP pública detectada: $PUBLIC_IP"
         LOCAL_IP=$(hostname -I | awk '{print $1}')
         SUBNET=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
@@ -157,7 +159,6 @@ install_microk8s() {
 # ========================
 configure_kubeconfig_public_ip() {
     print_status "Detectando IP pública de la instancia..."
-    PUBLIC_IP=$(curl -s ifconfig.me)
     print_status "IP pública detectada: $PUBLIC_IP"
 
     CSR_FILE="/var/snap/microk8s/current/certs/csr.conf.template"
@@ -407,6 +408,7 @@ EOF
         --set cloudflare.secretName=cloudflare-api-token \
         --set policy=sync \
         --set env=null \
+        --set annotationFilter[0]=external-dns.alpha.kubernetes.io/target
         # --set domainFilters=*.cuemby-lab.com
 
     # Install NGINX
@@ -762,6 +764,7 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set core.imgproxy.environment.IMGPROXY_KEY="c86ee9da270bd06f3f3f39ed33264d8124ada22a957f26452e385ee0c79f5f4d" \
         --set core.imgproxy.environment.IMGPROXY_KEY="bc4682582207c756d325115d8caeb71a" \
@@ -798,6 +801,7 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set-string core.kong.ingress.hosts[0].host=$API_DOMAIN \
         --set-string core.kong.ingress.hosts[0].paths[0].path="/" \
@@ -814,6 +818,7 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set core.secret.jwt.anonKey="${JWT_ANON_KEY}" \
         --set core.secret.jwt.serviceKey="${JWT_SERVICE_KEY}" \
@@ -839,6 +844,7 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set dashboard.dashboard.image.repository="netsaj/cp-dashboard" \
         --set dashboard.dashboard.image.tag="latest" \
@@ -855,6 +861,7 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set walrus.secret.db.password="$PG_PASSWORD" \
         --set walrus.secret.minio.rootUser="$MINIO_USERNAME" \
@@ -871,6 +878,7 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set apiGateway.apiGateway.environment.BACKEND_HOST="http://cuemby-platform-core-kong:8000" \
         --set-string apiGateway.apiGateway.ingress.hosts.core="$GATEWAY_DOMAIN" \
@@ -884,10 +892,11 @@ install_cuemby_platform() {
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
             "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set apiGateway.apiGateway.image.repository="netsaj/cp-apigw" \
         --set apiGateway.apiGateway.image.tag="v0.0.1-dev.8" \
-        --wait --timeout=600s
+        --wait --timeout=900s
 }
 
 # ===========================
