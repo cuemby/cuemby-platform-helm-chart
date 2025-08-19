@@ -141,7 +141,7 @@ spec:
               value: ""
         - name: webhooks
           ports:
-            - containerPort: 9085
+            - containerPort: 9087
           image: "{{ .Values.platform.image.repository }}:{{ .Values.platform.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.platform.image.pullPolicy }}
           command: ["/app/bin/webhooks"]
@@ -184,7 +184,7 @@ spec:
             - name: METRICS_URL
               value: "http://platform-service:9082"
             - name: WEBHOOKS_URL
-              value: "http://platform-service:9085"
+              value: "http://platform-service:9087"
             - name: QUEUE_NAME_DELETION_WORKER
               value: "deletion_worker"
 {{- end }}
