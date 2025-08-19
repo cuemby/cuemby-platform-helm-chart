@@ -762,7 +762,7 @@ install_cuemby_platform() {
             "external-dns.alpha.kubernetes.io/hostname":"'$REGISTRY_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
-            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true",
             "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set core.imgproxy.environment.IMGPROXY_KEY="c86ee9da270bd06f3f3f39ed33264d8124ada22a957f26452e385ee0c79f5f4d" \
@@ -799,7 +799,7 @@ install_cuemby_platform() {
             "external-dns.alpha.kubernetes.io/hostname":"'$STORAGE_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
-            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true",
             "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set-string core.kong.ingress.hosts[0].host=$API_DOMAIN \
@@ -816,7 +816,7 @@ install_cuemby_platform() {
             "external-dns.alpha.kubernetes.io/hostname":"'$API_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
-            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true",
             "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set core.secret.jwt.anonKey="${JWT_ANON_KEY}" \
@@ -842,7 +842,7 @@ install_cuemby_platform() {
             "external-dns.alpha.kubernetes.io/hostname":"studio.market.cuemby.net",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
-            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true",
             "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set dashboard.dashboard.image.repository="netsaj/cp-dashboard" \
@@ -859,7 +859,7 @@ install_cuemby_platform() {
             "external-dns.alpha.kubernetes.io/hostname":"'$DASHBOARD_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
-            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true",
             "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set walrus.secret.db.password="$PG_PASSWORD" \
@@ -876,7 +876,7 @@ install_cuemby_platform() {
             "external-dns.alpha.kubernetes.io/hostname":"'$WALRUS_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
-            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true",
             "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set apiGateway.apiGateway.environment.BACKEND_HOST="http://cuemby-platform-core-kong:8000" \
@@ -890,7 +890,7 @@ install_cuemby_platform() {
             "external-dns.alpha.kubernetes.io/hostname":"'$GATEWAY_DOMAIN'",
             "nginx.ingress.kubernetes.io/backend-protocol":"HTTP",
             "nginx.ingress.kubernetes.io/force-ssl-redirect":"true",
-            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true"
+            "external-dns.alpha.kubernetes.io/cloudflare-proxied":"true",
             "external-dns.alpha.kubernetes.io/target": "'$PUBLIC_IP'"
         }' \
         --set apiGateway.apiGateway.image.repository="netsaj/cp-apigw" \
