@@ -119,57 +119,37 @@ create_namespace() {
 # Install MicroK8s & Public IP Setup
 # ========================
 install_microk8s() {
-  print_status "Instalando MicroK8s..."
-  snap install microk8s --classic --channel=1.30/stable
+    print_status "Instalando MicroK8s..."
+    snap install microk8s --classic --channel=1.30/stable
 
-  # Agregar usuario al grupo (si no es root)
-  if [ "$(id -u)" -ne 0 ]; then
-    print_status "Agregando usuario actual al grupo microk8s..."
-    sudo usermod -aG microk8s "$USER"
-  fi
+    # Si no es root, agregar usuario al grupo
+    if [ "$(id -u)" -ne 0 ]; then
+        print_status "Agregando usuario actual al grupo microk8s..."
+        sudo usermod -a -G microk8s "$USER"
+    fi
 
-  print_status "Esperando a que MicroK8s esté listo..."
-  microk8s status --wait-ready
+    print_status "Esperando a que MicroK8s esté completamente operativo..."
+    microk8s status --wait-ready
 
-  print_status "Habilitando complementos básicos (dns, storage, helm3)..."
-  microk8s enable dns storage helm3
+    print_status "Habilitando complementos básicos (dns, storage, helm3)..."
+    microk8s enable dns storage helm3
 
-  # ----------------------------
-  # Detección de IPs sin ipcalc
-  # ----------------------------
-  # IP local (primera IPv4 global de la máquina)
-  LOCAL_IP="$(ip -4 addr show scope global | awk '/inet /{print $2}' | cut -d/ -f1 | head -n1)"
-  [ -z "$LOCAL_IP" ] && LOCAL_IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
+    # ========================
+    # Enable MetalLB with automatic network detection
+    # ========================
+    print_status "Verificando MetalLB..."
+    if ! microk8s status | grep -q "metallb: enabled"; then
+        PUBLIC_IP=$(curl -s ifconfig.me)
+        print_status "IP pública detectada: $PUBLIC_IP"
+        LOCAL_IP=$(hostname -I | awk '{print $1}')
+        SUBNET=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
+        START_IP="${SUBNET}.240"
+        END_IP="${SUBNET}.250"
+        METALLB_RANGE="${START_IP}-${END_IP}"
+        microk8s enable metallb:$METALLB_RANGE
+    fi
 
-  # IP pública (curl con fallback)
-  PUBLIC_IP="$(curl -s --max-time 5 ifconfig.me || true)"
-  if ! [[ "$PUBLIC_IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-    PUBLIC_IP="$(curl -s --max-time 5 https://api.ipify.org || true)"
-  fi
-
-  print_status "IP local detectada: ${LOCAL_IP:-desconocida}"
-  print_status "IP pública detectada: ${PUBLIC_IP:-desconocida}"
-
-  # Interfaz de salida (la que usa el nodo para Internet)
-  local IFACE
-  IFACE="$(ip route get 1.1.1.1 | awk '{print $5; exit}')"
-
-  # ¿La IP pública ya está en la NIC?
-  if ! ip -4 addr show dev "$IFACE" | grep -q " ${PUBLIC_IP}/"; then
-    echo "[INFO] La IP pública $PUBLIC_IP no está en $IFACE."
-    echo "[INFO] Intentando asignarla como /32 al host (requiere que tu proveedor lo permita)."
-    # Si tu red lo soporta, esto fija la IP en la NIC:
-    sudo ip addr add "${PUBLIC_IP}/32" dev "$IFACE" || {
-      echo "[WARN] No se pudo asignar ${PUBLIC_IP}/32 a ${IFACE}. Si tu proveedor no soporta IP pública en la NIC, no funcionará el anuncio L2."
-    }
-  fi
-
-  echo "[INFO] Habilitando MetalLB con rango único ${PUBLIC_IP}-${PUBLIC_IP}…"
-  # Si ya estaba configurado con otro rango, reconfigura:
-  microk8s status | grep -q "metallb: enabled" && microk8s disable metallb || true
-  microk8s enable "metallb:${PUBLIC_IP}-${PUBLIC_IP}"
-
-  print_success "MicroK8s instalado y MetalLB configurado."
+    print_success "MicroK8s instalado."
 }
 
 # ========================
