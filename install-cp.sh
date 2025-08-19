@@ -143,11 +143,11 @@ install_microk8s() {
     print_status "Verificando MetalLB..."
     if ! microk8s status | grep -q "metallb: enabled"; then
         print_status "IP pública detectada: $PUBLIC_IP"
-        LOCAL_IP=$(hostname -I | awk '{print $1}')
-        SUBNET=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
-        START_IP="${SUBNET}.240"
-        END_IP="${SUBNET}.250"
-        METALLB_RANGE="${START_IP}-${END_IP}"
+        # LOCAL_IP=$(hostname -I | awk '{print $1}')
+        # SUBNET=$(echo "$LOCAL_IP" | awk -F. '{print $1"."$2"."$3}')
+        # START_IP="${SUBNET}.240"
+        # END_IP="${SUBNET}.250"
+        METALLB_RANGE="${PUBLIC_IP}-${PUBLIC_IP}"
         microk8s enable metallb:$METALLB_RANGE
     fi
 
