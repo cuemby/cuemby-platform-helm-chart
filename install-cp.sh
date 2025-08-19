@@ -405,7 +405,9 @@ EOF
         --set provider=cloudflare \
         --set txtOwnerId="cuemby-lab" \
         --set cloudflare.secretName=cloudflare-api-token \
-        --set policy=sync
+        --set policy=sync \
+        --set env=null \
+        # --set domainFilters=*.cuemby-lab.com
 
     # Install NGINX
     print_status "Instalando NGINX Ingress Controller…"
