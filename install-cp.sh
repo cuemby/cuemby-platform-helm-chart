@@ -408,7 +408,6 @@ EOF
         --set cloudflare.secretName=cloudflare-api-token \
         --set policy=sync \
         --set env=null \
-        --set annotationFilter[0]=external-dns.alpha.kubernetes.io/target
         # --set domainFilters=*.cuemby-lab.com
 
     # Install NGINX
